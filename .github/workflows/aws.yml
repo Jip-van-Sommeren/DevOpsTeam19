@@ -19,7 +19,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt -t .
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt -t src
+          fi
       
       - name: Package code
         run: cd src && zip -r function.zip .
