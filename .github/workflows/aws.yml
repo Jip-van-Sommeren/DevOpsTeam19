@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.txt -t .
       
       - name: Package code
-        run: zip -r function.zip .
+        run: cd src && zip -r function.zip .
 
       - name: Deploy to Lambda
         env:
@@ -30,4 +30,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
-          aws lambda update-function-code --function-name MyLambdaFunction --zip-file fileb://function.zip
+          aws lambda update-function-code --function-name hello_world --zip-file fileb://function.zip
