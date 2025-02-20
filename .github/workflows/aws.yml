@@ -74,7 +74,7 @@ jobs:
         run: |
           IMAGE_URI="${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
           echo "Building image: $IMAGE_URI"
-          docker build -t "$IMAGE_URI" src
+          docker build -f src/Dockerfile -t "$IMAGE_URI" .
           docker push "$IMAGE_URI"
 
       - name: Update Lambda Function Code
