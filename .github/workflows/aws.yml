@@ -30,4 +30,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
-          aws lambda update-function-code --function-name hello_world --handler main.lambda_handler --zip-file fileb://src/function.zip
+          aws lambda update-function-code --function-name hello_world --zip-file fileb://src/function.zip
+      
+      - name: Update Lambda function configuration (set handler)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          aws lambda update-function-configuration --function-name hello_world --handler main.lambda_handler
