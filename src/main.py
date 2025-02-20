@@ -1,3 +1,4 @@
+import os
 import json
 
 
@@ -8,13 +9,3 @@ def lambda_handler(event, context):
     """
     response = {"statusCode": 200, "body": json.dumps("Hello, world!")}
     return response
-
-
-if __name__ == "__main__":
-    # Simulate a Lambda event and context for local testing
-    test_event = {}  # Customize as needed
-    test_context = None  # You can leave this as None for basic testing
-
-    result = lambda_handler(test_event, test_context)
-    print("Lambda function result:")
-    print(result)
