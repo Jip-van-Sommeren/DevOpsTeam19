@@ -90,18 +90,22 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name items_item_id_methods \
             --zip-file fileb://src/items_item_id_methods.zip
+          check_update items_method
       - name: Update items_item_id_methods Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-configuration \
             --function-name items_item_id_methods \
             --handler items_item_id_methods.lambda_handler
+          check_update items_method
       ###################################################
       # Package & Deploy items_item_id__purchase_methods Lambda   #
       ###################################################
@@ -116,18 +120,22 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name items_item_id_purchase_methods \
             --zip-file fileb://src/items_item_id_purchase_methods.zip
+          check_update items_method
       - name: Update items_item_id_purchase_methods Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-configuration \
             --function-name items_item_id_purchase_methods \
             --handler items_item_id_purchase_methods.lambda_handler
+          check_update items_method
       ###################################################
       # Package & Deploy items_item_id_reservations_methods Lambda   #
       ###################################################
@@ -142,9 +150,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name items_item_id_reservations_methods \
             --zip-file fileb://src/items_item_id_reservations_methods.zip
+          check_update items_method
       - name: Update items_item_id_reservations_methods Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -154,6 +164,7 @@ jobs:
           aws lambda update-function-configuration \
             --function-name items_item_id_reservations_methods \
             --handler items_item_id_reservations_methods.lambda_handler
+          check_update items_method
 
       ###################################################
       # Package & Deploy location_methods Lambda   #
@@ -169,18 +180,22 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name location_methods \
             --zip-file fileb://src/location_methods.zip
+          check_update items_method
       - name: Update location_methods Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-configuration \
             --function-name location_methods \
             --handler location_methods.lambda_handler
+          check_update items_method
 
       ###################################################
       # Package & Deploy reservations_reservation_id_method Lambda   #
@@ -196,18 +211,22 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name reservations_reservation_id_method \
             --zip-file fileb://src/reservations_reservation_id_method.zip
+          check_update items_method
       - name: Update reservations_reservation_id_method Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-configuration \
             --function-name reservations_reservation_id_method \
             --handler reservations_reservation_id_method.lambda_handler
+          check_update items_method
       ###################################################
       # Package & Deploy items_item_id_location_location_id_method Lambda   #
       ###################################################
@@ -222,15 +241,20 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name items_item_id_location_location_id_method \
             --zip-file fileb://src/items_item_id_location_location_id_method.zip
+          check_update items_method
       - name: Update items_item_id_location_location_id_method Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-configuration \
             --function-name items_item_id_location_location_id_method \
             --handler items_item_id_location_location_id_method.lambda_handler
+          check_update items_method
+          
