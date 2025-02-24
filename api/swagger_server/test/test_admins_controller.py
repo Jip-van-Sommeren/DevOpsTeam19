@@ -6,17 +6,18 @@ from flask import json
 from six import BytesIO
 
 from swagger_server.models.item import Item  # noqa: E501
-from swagger_server.models.location import Location  # noqa: E501
+from swagger_server.models.reservation_update import ReservationUpdate  # noqa: E501
+from swagger_server.models.warehouse import Warehouse  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
 class TestAdminsController(BaseTestCase):
     """AdminsController integration test stubs"""
 
-    def test_add_item(self):
-        """Test case for add_item
+    def test_create_item(self):
+        """Test case for create_item
 
-        adds an inventory item
+        Create new item
         """
         body = Item()
         response = self.client.open(
@@ -27,12 +28,12 @@ class TestAdminsController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_add_location(self):
-        """Test case for add_location
+    def test_create_warehouse(self):
+        """Test case for create_warehouse
 
-        add a location
+        Create new warehouse
         """
-        body = Location()
+        body = Warehouse()
         response = self.client.open(
             '/location',
             method='POST',
@@ -41,21 +42,21 @@ class TestAdminsController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_delete_item_by_id(self):
-        """Test case for delete_item_by_id
+    def test_delete_item(self):
+        """Test case for delete_item
 
-        delete an item
+        Delete item
         """
         response = self.client.open(
-            '/items/{id}'.format(id='id_example'),
+            '/items/{item_id}'.format(item_id='item_id_example'),
             method='DELETE')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_location(self):
-        """Test case for get_location
+    def test_get_warehouse_info(self):
+        """Test case for get_warehouse_info
 
-        searches locations
+        Get warehouse info
         """
         response = self.client.open(
             '/location',
@@ -63,14 +64,31 @@ class TestAdminsController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_update_item_by_id(self):
-        """Test case for update_item_by_id
+    def test_update_item(self):
+        """Test case for update_item
 
-        update an item
+        Update item
         """
+        body = Item()
         response = self.client.open(
-            '/items/{id}'.format(id='id_example'),
-            method='PUT')
+            '/items/{item_id}'.format(item_id='item_id_example'),
+            method='PUT',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_update_reservation(self):
+        """Test case for update_reservation
+
+        Confirm or alter reservation (including changing to purchased)
+        """
+        body = ReservationUpdate()
+        response = self.client.open(
+            '/reservations/{reservation_id}'.format(reservation_id='reservation_id_example'),
+            method='PUT',
+            data=json.dumps(body),
+            content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
