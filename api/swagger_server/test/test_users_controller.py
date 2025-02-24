@@ -6,30 +6,32 @@ from flask import json
 from six import BytesIO
 
 from swagger_server.models.item import Item  # noqa: E501
+from swagger_server.models.purchase_request import PurchaseRequest  # noqa: E501
+from swagger_server.models.reservation_request import ReservationRequest  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
 class TestUsersController(BaseTestCase):
     """UsersController integration test stubs"""
 
-    def test_buy_item(self):
-        """Test case for buy_item
+    def test_get_item_stock_all_locations(self):
+        """Test case for get_item_stock_all_locations
 
-        buy an inventory item
+        Get stock of specific item for all locations
         """
         response = self.client.open(
-            '/items/buy/{id}'.format(id='id_example'),
+            '/items/{item_id}'.format(item_id='item_id_example'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
-    def test_get_item_by_id(self):
-        """Test case for get_item_by_id
+    def test_get_item_stock_specific_location(self):
+        """Test case for get_item_stock_specific_location
 
-        get item by id
+        Get stock of specific item for specific location
         """
         response = self.client.open(
-            '/items/{id}'.format(id='id_example'),
+            '/items/{item_id}/location/{location_id}'.format(item_id='item_id_example', location_id='location_id_example'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -37,7 +39,7 @@ class TestUsersController(BaseTestCase):
     def test_get_items(self):
         """Test case for get_items
 
-        searches items
+        Get list of all items
         """
         query_string = [('search_string', 'search_string_example'),
                         ('skip', 1),
@@ -46,6 +48,45 @@ class TestUsersController(BaseTestCase):
             '/items',
             method='GET',
             query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_purchase_item(self):
+        """Test case for purchase_item
+
+        Purchase an item
+        """
+        body = PurchaseRequest()
+        response = self.client.open(
+            '/items/{item_id}/purchase'.format(item_id='item_id_example'),
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_reserve_item(self):
+        """Test case for reserve_item
+
+        Reserve item
+        """
+        body = ReservationRequest()
+        response = self.client.open(
+            '/items/{item_id}/reservations'.format(item_id='item_id_example'),
+            method='POST',
+            data=json.dumps(body),
+            content_type='application/json')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_view_item_reservation(self):
+        """Test case for view_item_reservation
+
+        View reservation for an item
+        """
+        response = self.client.open(
+            '/items/{item_id}/reservations'.format(item_id='item_id_example'),
+            method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

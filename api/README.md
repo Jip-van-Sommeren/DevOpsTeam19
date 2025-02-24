@@ -11,10 +11,6 @@ This example uses the [Connexion](https://github.com/zalando/connexion) library 
 Python 3.5.2+
 
 ## Usage
-### Pycharm
-Add a Python Interpreter, Settings -> Python Interpreter. Set its location to the api folder.
-Change directory into the api folder and execute the commands below.
-
 To run the server, please execute the following from the root directory:
 
 ```

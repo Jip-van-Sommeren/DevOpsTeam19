@@ -21,7 +21,7 @@ setup(
     name=NAME,
     version=VERSION,
     description="Inventory Management API",
-    author_email="",
+    author_email="14822857@uva.nl",
     url="",
     keywords=["Swagger", "Inventory Management API"],
     install_requires=REQUIRES,
@@ -31,6 +31,6 @@ setup(
     entry_points={
         'console_scripts': ['swagger_server=swagger_server.__main__:main']},
     long_description="""\
-    This is a simple API
+    This is a simple API for managing inventory and warehouses.
     """
 )
