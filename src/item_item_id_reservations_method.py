@@ -53,6 +53,7 @@ def lambda_handler(event, context):
     Expects a JSON body containing reservation details.
     """
     # Enforce POST method only
+    # TODO: Add GET Method
     if event.get("httpMethod", "") != "POST":
         return {
             "statusCode": 405,

@@ -203,3 +203,29 @@ jobs:
           aws lambda update-function-configuration \
             --function-name reservations_reservation_id_method \
             --handler reservations_reservation_id_method.lambda_handler
+      ###################################################
+      # Package & Deploy items_item_id_location_location_id_method Lambda   #
+      ###################################################
+      - name: Package items_item_id_location_location_id_method function
+        run: |
+          cd src
+          zip -r items_item_id_location_location_id_method.zip items_item_id_location_location_id_method.py
+          cd ..
+      - name: Deploy items_item_id_location_location_id_method Lambda Function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          aws lambda update-function-code \
+            --function-name items_item_id_location_location_id_method \
+            --zip-file fileb://src/items_item_id_location_location_id_method.zip
+      - name: Update items_item_id_location_location_id_method Function Configuration (set handler)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          aws lambda update-function-configuration \
+            --function-name items_item_id_location_location_id_method \
+            --handler items_item_id_location_location_id_method.lambda_handler
