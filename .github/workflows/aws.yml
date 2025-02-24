@@ -33,17 +33,14 @@ jobs:
           cd db_layer
           zip -r ../db_layer.zip .
           cd ..
-      - name: Publish Lambda Layer
+      - name: Publish Lambda Layer (if changed)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
-          
-          aws lambda publish-layer-version \
-            --layer-name my-db-layer \
-            --zip-file fileb://db_layer.zip \
-            --compatible-runtimes python3.13
+          chmod +x scripts/check_and_publish_layer.sh
+          ./scripts/check_and_publish_layer.sh
 
       #########################################
       # Package & Deploy items_method Lambda  #
@@ -71,9 +68,12 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name items_method \
-            --handler items_method.lambda_handler
+            --handler items_method.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
 
       ###################################################
@@ -102,9 +102,12 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name items_item_id_methods \
-            --handler items_item_id_methods.lambda_handler
+            --handler items_item_id_methods.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
       ###################################################
       # Package & Deploy items_item_id__purchase_methods Lambda   #
@@ -132,9 +135,12 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name items_item_id_purchase_methods \
-            --handler items_item_id_purchase_methods.lambda_handler
+            --handler items_item_id_purchase_methods.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
       ###################################################
       # Package & Deploy items_item_id_reservations_methods Lambda   #
@@ -161,9 +167,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name items_item_id_reservations_methods \
-            --handler items_item_id_reservations_methods.lambda_handler
+            --handler items_item_id_reservations_methods.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
 
       ###################################################
@@ -192,9 +202,12 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name location_methods \
-            --handler location_methods.lambda_handler
+            --handler location_methods.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
 
       ###################################################
@@ -223,9 +236,12 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name reservations_reservation_id_method \
-            --handler reservations_reservation_id_method.lambda_handler
+            --handler reservations_reservation_id_method.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
       ###################################################
       # Package & Deploy items_item_id_location_location_id_method Lambda   #
@@ -253,8 +269,11 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name items_item_id_location_location_id_method \
-            --handler items_item_id_location_location_id_method.lambda_handler
+            --handler items_item_id_location_location_id_method.lambda_handler \
+            --layers "$LATEST_LAYER"
           check_update items_method
           
