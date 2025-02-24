@@ -1,0 +1,8 @@
+# Ignore all files in db_layer/python
+db_layer/python/**
+
+# But do not ignore .py files in the root of db_layer/python
+!db_layer/python/*.py
+
+.idea/
+venv/
