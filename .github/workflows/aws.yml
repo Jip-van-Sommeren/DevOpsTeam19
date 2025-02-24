@@ -39,6 +39,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          
           aws lambda publish-layer-version \
             --layer-name my-db-layer \
             --zip-file fileb://db_layer.zip \
@@ -58,18 +59,22 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-code \
             --function-name items_method \
             --zip-file fileb://src/items_method.zip
+          check_update items_method
       - name: Update items_method Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
+          source scripts/check_update.sh
           aws lambda update-function-configuration \
             --function-name items_method \
             --handler items_method.lambda_handler
+          check_update items_method
 
       ###################################################
       # Package & Deploy items_item_id_methods Lambda   #
