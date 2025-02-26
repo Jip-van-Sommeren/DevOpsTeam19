@@ -168,6 +168,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
           source scripts/check_update.sh
+
           LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
