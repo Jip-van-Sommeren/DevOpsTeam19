@@ -14,14 +14,15 @@ def reserve_item(item_id, reservation_data):
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO reservations (item_id, user_id, reservation_details)
+                INSERT INTO reservations (item_id,
+                    user_id, status)
                 VALUES (%s, %s, %s)
                 RETURNING id;
                 """,
                 (
                     item_id,
                     reservation_data.get("user_id"),
-                    reservation_data.get("reservation_details"),
+                    reservation_data.get("status"),
                 ),
             )
             reservation_id = cur.fetchone()[0]
@@ -42,7 +43,9 @@ def reserve_item(item_id, reservation_data):
         print("Error reserving item:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error reserving item", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error reserving item", "error": str(e)}
+            ),
         }
 
 

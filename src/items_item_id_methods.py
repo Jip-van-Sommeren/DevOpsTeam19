@@ -8,7 +8,8 @@ def get_item(item_id):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, name, description FROM items WHERE id = %s;", (item_id,)
+                "SELECT id, name, description FROM items WHERE id = %s;",
+                (item_id,),
             )
             item = cur.fetchone()
         if item:
@@ -28,7 +29,9 @@ def get_item(item_id):
         print("Error in get_item:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error retrieving item", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error retrieving item", "error": str(e)}
+            ),
         }
 
 
@@ -43,7 +46,8 @@ def create_item(item_id, payload):
                     "body": json.dumps({"message": "Item already exists"}),
                 }
             cur.execute(
-                "INSERT INTO items (id, name, description) VALUES (%s, %s, %s) RETURNING id, name, description;",
+                "INSERT INTO items (id, name, description) VALUES  \
+                    (%s, %s, %s) RETURNING id, name, description;",
                 (item_id, payload.get("name"), payload.get("description")),
             )
             new_item = cur.fetchone()
@@ -52,7 +56,11 @@ def create_item(item_id, payload):
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(
-                {"id": new_item[0], "name": new_item[1], "description": new_item[2]}
+                {
+                    "id": new_item[0],
+                    "name": new_item[1],
+                    "description": new_item[2],
+                }
             ),
         }
     except Exception as e:
@@ -60,7 +68,9 @@ def create_item(item_id, payload):
         print("Error in create_item:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error creating item", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error creating item", "error": str(e)}
+            ),
         }
 
 
@@ -68,7 +78,8 @@ def update_item(item_id, payload):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE items SET name = %s, description = %s WHERE id = %s RETURNING id, name, description;",
+                "UPDATE items SET name = %s, description = %s WHERE id = %s \
+                    RETURNING id, name, description;",
                 (payload.get("name"), payload.get("description"), item_id),
             )
             updated_item = cur.fetchone()
@@ -94,7 +105,9 @@ def update_item(item_id, payload):
         print("Error in update_item:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error updating item", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error updating item", "error": str(e)}
+            ),
         }
 
 
@@ -121,7 +134,9 @@ def handler(event, context):
         except Exception as e:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"message": "Invalid JSON", "error": str(e)}),
+                "body": json.dumps(
+                    {"message": "Invalid JSON", "error": str(e)}
+                ),
             }
         return create_item(item_id, payload)
     elif http_method == "PUT":
@@ -130,11 +145,15 @@ def handler(event, context):
         except Exception as e:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"message": "Invalid JSON", "error": str(e)}),
+                "body": json.dumps(
+                    {"message": "Invalid JSON", "error": str(e)}
+                ),
             }
         return update_item(item_id, payload)
     else:
         return {
             "statusCode": 405,
-            "body": json.dumps({"message": f"Method {http_method} not allowed"}),
+            "body": json.dumps(
+                {"message": f"Method {http_method} not allowed"}
+            ),
         }

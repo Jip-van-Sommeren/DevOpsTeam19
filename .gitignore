@@ -6,3 +6,4 @@ db_layer/python/**
 
 .idea/
 venv/
+DB_SCHEMA.txt
