@@ -1,4 +1,4 @@
-# In scripts/check_update.sh
+
 check_update() {
   local FUNCTION_NAME=$1
   echo "Checking update status for $FUNCTION_NAME..."

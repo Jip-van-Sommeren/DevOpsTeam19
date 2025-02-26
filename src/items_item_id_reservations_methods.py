@@ -1,8 +1,7 @@
 import json
-from db_layer import db  # Import our shared db module from the layer
+from db_layer.python.db_connect import get_connection
 
-# Create a global connection that can be reused on warm invocations
-conn = db.get_connection()
+conn = get_connection()
 
 
 def reserve_item(item_id, reservation_data):

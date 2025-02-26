@@ -3,9 +3,6 @@ from db_layer.python.db_connect import (
     get_connection,
 )  # Import the shared db module from the layer
 
-# Create a global connection (this will be reused on warm invocations)
-# Note: It's generally a good practice to check if the connection is closed
-# and recreate it if needed.
 conn = get_connection()
 
 

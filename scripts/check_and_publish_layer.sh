@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Configuration: adjust as needed.
+
 LAYER_NAME="db_layer"
 LAYER_ZIP="db_layer.zip"
 RUNTIME="python3.13"

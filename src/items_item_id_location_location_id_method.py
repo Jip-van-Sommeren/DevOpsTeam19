@@ -1,8 +1,7 @@
 import json
-from db_layer import db  # Import the shared db module from the layer
+from db_layer.python.db_connect import get_connection
 
-# Establish a global connection to reuse across warm invocations
-conn = db.get_connection()
+conn = get_connection()
 
 
 def get_item_stock_for_location(item_id, location_id):
@@ -38,7 +37,7 @@ def get_item_stock_for_location(item_id, location_id):
             ),
         }
     except Exception as e:
-        # SELECT queries don't usually need a rollback, but this is here for consistency
+
         print("Error fetching stock information:", str(e))
         return {
             "statusCode": 500,

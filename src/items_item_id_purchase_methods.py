@@ -1,8 +1,9 @@
 import json
-from db_layer import db  # Import our shared db module from the layer
+from db_layer.python.db_connect import get_connection
+
 
 # Create a global connection to be reused in warm invocations
-conn = db.get_connection()
+conn = get_connection()
 
 
 def purchase_item(item_id, purchase_data):
@@ -12,7 +13,6 @@ def purchase_item(item_id, purchase_data):
     """
     try:
         with conn.cursor() as cur:
-            # Insert a new purchase record. Adjust the SQL as needed for your schema.
             cur.execute(
                 "INSERT INTO purchases (item_id, payment_token) VALUES (%s, %s) RETURNING id;",
                 (item_id, purchase_data.get("payment_token")),
@@ -48,7 +48,6 @@ def lambda_handler(event, context):
             "body": json.dumps({"message": "Method not allowed"}),
         }
 
-    # Extract the item_id from the path parameters
     path_params = event.get("pathParameters") or {}
     item_id = path_params.get("item_id")
     if not item_id:
@@ -68,8 +67,6 @@ def lambda_handler(event, context):
             ),
         }
 
-    # Optionally, you can read additional headers if needed:
     # auth_token = event.get("headers", {}).get("Authorization")
 
-    # Process the purchase
     return purchase_item(item_id, purchase_data)
