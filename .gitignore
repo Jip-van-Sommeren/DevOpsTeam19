@@ -5,5 +5,5 @@ db_layer/python/**
 !db_layer/python/*.py
 
 .idea/
-venv/
+venv
 DB_SCHEMA.txt
