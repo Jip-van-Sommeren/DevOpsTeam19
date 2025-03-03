@@ -32,12 +32,15 @@ def add_item(item):
     """
     Inserts a new item into the database.
     Expects `item` to be a dict with at least a 'name' key.
+    Optionally, it can include a 'description' key.
     """
+    # Use a default description if not provided
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO items (name) VALUES (%s) RETURNING id, name;",
-                (item["name"],),
+                "INSERT INTO items (name, description, price) VALUES \
+                    (%s, %s, %s) RETURNING id, name, description, price;",
+                (item["name"], item["description"], item["price"]),
             )
             new_item = cur.fetchone()
             conn.commit()
@@ -87,17 +90,3 @@ def lambda_handler(event, context):
 
     # If the request doesn't match any endpoint, return 404
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}
-
-
-if __name__ == "__main__":
-
-    print(
-        handler(
-            {
-                "httpMethod": "POST",
-                "resource": "/items",
-                "body": json.dumps({"name": "New Item"}),
-            },
-            None,
-        )
-    )
