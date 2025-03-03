@@ -21,7 +21,7 @@ jobs:
       - name: Install function dependencies
         run: |
           if [ -f requirements.txt ]; then
-            pip install -r requirements.txt -t db_layer/python
+            pip install -r requirements.txt -t python/db_layer
           fi
 
       ##############################
@@ -30,9 +30,7 @@ jobs:
       - name: Package Layer
         run: |
           # Ensure the layer package has a "python" folder at its root
-          cd db_layer
-          zip -r ../db_layer.zip .
-          cd ..
+          zip -r db_layer.zip python
       - name: Publish Lambda Layer (if changed)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

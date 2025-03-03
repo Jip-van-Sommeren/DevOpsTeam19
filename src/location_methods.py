@@ -1,6 +1,6 @@
 import json
 from psycopg2.extras import RealDictCursor
-from db_layer.python.db_connect import get_connection
+from db_layer.db_connect import get_connection
 
 conn = get_connection()
 

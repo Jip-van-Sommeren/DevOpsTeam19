@@ -1,6 +1,6 @@
 import json
 from psycopg2.extras import RealDictCursor
-from db_layer.python.db_connect import get_connection
+from db_layer.db_connect import get_connection
 
 conn = get_connection()
 
@@ -87,3 +87,17 @@ def handler(event, context):
 
     # If the request doesn't match any endpoint, return 404
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}
+
+
+if __name__ == "__main__":
+
+    print(
+        handler(
+            {
+                "httpMethod": "POST",
+                "resource": "/items",
+                "body": json.dumps({"name": "New Item"}),
+            },
+            None,
+        )
+    )

@@ -1,7 +1,6 @@
 import json
-from db_layer.python.db_connect import (
-    get_connection,
-)  # Import the shared db module from the layer
+from db_layer.db_connect import get_connection
+
 
 conn = get_connection()
 
@@ -11,7 +10,11 @@ def update_reservation(reservation_id, payload):
         with conn.cursor() as cur:
             cur.execute(
                 "UPDATE reservations SET name = %s, description = %s WHERE id = %s RETURNING id, name, description;",
-                (payload.get("name"), payload.get("description"), reservation_id),
+                (
+                    payload.get("name"),
+                    payload.get("description"),
+                    reservation_id,
+                ),
             )
             updated_reservation = cur.fetchone()
             if not updated_reservation:
@@ -63,11 +66,15 @@ def handler(event, context):
         except Exception as e:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"message": "Invalid JSON", "error": str(e)}),
+                "body": json.dumps(
+                    {"message": "Invalid JSON", "error": str(e)}
+                ),
             }
         return update_reservation(reservation_id, payload)
     else:
         return {
             "statusCode": 405,
-            "body": json.dumps({"message": f"Method {http_method} not allowed"}),
+            "body": json.dumps(
+                {"message": f"Method {http_method} not allowed"}
+            ),
         }
