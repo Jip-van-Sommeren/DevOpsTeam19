@@ -57,7 +57,7 @@ def add_item(item):
         }
 
 
-def handler(event, context):
+def lambda_handler(event, context):
     """
     Main Lambda handler. Routes requests based on HTTP method.
     Assumes API Gateway is set up with Lambda proxy integration.

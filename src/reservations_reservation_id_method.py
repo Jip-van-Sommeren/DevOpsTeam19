@@ -45,7 +45,7 @@ def update_reservation(reservation_id, payload):
         }
 
 
-def handler(event, context):
+def lambda_handler(event, context):
     """
     Main Lambda handler for the /reservations/{reservation_id} endpoint.
     Routes the request based on the HTTP method.

@@ -111,7 +111,7 @@ def update_item(item_id, payload):
         }
 
 
-def handler(event, context):
+def lambda_handler(event, context):
     """
     Main Lambda handler for the /items/{item_id} endpoint.
     Routes the request based on the HTTP method.
