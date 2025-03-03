@@ -1,4 +1,3 @@
-import os
 import json
 from psycopg2.extras import RealDictCursor
 from db_layer.python.db_connect import get_connection
@@ -23,7 +22,9 @@ def get_items():
         print("Error fetching items:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error fetching items", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error fetching items", "error": str(e)}
+            ),
         }
 
 
@@ -50,7 +51,9 @@ def add_item(item):
         print("Error adding item:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error adding item", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error adding item", "error": str(e)}
+            ),
         }
 
 
@@ -74,7 +77,10 @@ def handler(event, context):
                 return {
                     "statusCode": 400,
                     "body": json.dumps(
-                        {"message": "Invalid JSON in request body", "error": str(e)}
+                        {
+                            "message": "Invalid JSON in request body",
+                            "error": str(e),
+                        }
                     ),
                 }
             return add_item(item)

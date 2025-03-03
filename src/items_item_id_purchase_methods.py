@@ -14,7 +14,8 @@ def purchase_item(item_id, purchase_data):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO purchases (item_id, payment_token) VALUES (%s, %s) RETURNING id;",
+                "INSERT INTO purchases (item_id, payment_token) VALUES \
+                    (%s, %s) RETURNING id;",
                 (item_id, purchase_data.get("payment_token")),
             )
             purchase_id = cur.fetchone()[0]
@@ -24,7 +25,10 @@ def purchase_item(item_id, purchase_data):
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(
-                {"message": "Item purchased successfully", "purchase_id": purchase_id}
+                {
+                    "message": "Item purchased successfully",
+                    "purchase_id": purchase_id,
+                }
             ),
         }
     except Exception as e:
@@ -32,7 +36,9 @@ def purchase_item(item_id, purchase_data):
         print("Error purchasing item:", str(e))
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Error purchasing item", "error": str(e)}),
+            "body": json.dumps(
+                {"message": "Error purchasing item", "error": str(e)}
+            ),
         }
 
 
