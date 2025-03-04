@@ -1,15 +1,95 @@
 import json
 from db_layer.db_connect import get_connection
 
-
 conn = get_connection()
 
 
-def update_reservation(reservation_id, payload):
+def get_reservation(reservation_id):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE reservations SET name = %s, description = %s WHERE id = %s RETURNING id, name, description;",
+                "SELECT id, user_id FROM reservations \
+                    WHERE id = %s;",
+                (reservation_id,),
+            )
+            reservation = cur.fetchone()
+        if reservation:
+            return {
+                "statusCode": 200,
+                "headers": {"Content-Type": "application/json"},
+                "body": json.dumps(
+                    {
+                        "id": reservation[0],
+                        "name": reservation[1],
+                        "description": reservation[2],
+                    }
+                ),
+            }
+        else:
+            return {
+                "statusCode": 404,
+                "body": json.dumps({"message": "reservation not found"}),
+            }
+    except Exception as e:
+        print("Error in get_reservation:", str(e))
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": "Error retrieving reservation", "error": str(e)}
+            ),
+        }
+
+
+def delete_reservation(reservation_id):
+    try:
+        with conn.cursor() as cur:
+            # First, delete rows in reservationd_items that
+            # reference this reservation_id
+            cur.execute(
+                "DELETE FROM reserved_items WHERE reservation_id = %s;",
+                (reservation_id,),
+            )
+            # Then, delete the reservation and return its details
+            cur.execute(
+                "DELETE FROM reservations WHERE id = %s RETURNING id;",
+                (reservation_id,),
+            )
+            deleted_reservation = cur.fetchone()
+            if not deleted_reservation:
+                # If no row was deleted, the reservation does not exist
+                return {
+                    "statusCode": 404,
+                    "body": json.dumps({"message": "reservation not found"}),
+                }
+            conn.commit()
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(
+                {
+                    "id": deleted_reservation[0],
+                    "name": deleted_reservation[1],
+                    "description": deleted_reservation[2],
+                }
+            ),
+        }
+    except Exception as e:
+        conn.rollback()
+        print("Error in delete_reservation:", str(e))
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": "Error deleting reservation", "error": str(e)}
+            ),
+        }
+
+
+def update_reservation(reservation_id: str, payload: dict[str, str]) -> dict:
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE reservations SET name = %s, description = %s WHERE \
+                    id = %s  RETURNING id, name, description;",
                 (
                     payload.get("name"),
                     payload.get("description"),
@@ -60,7 +140,20 @@ def lambda_handler(event, context):
             "body": json.dumps({"message": "Missing reservation_id in path"}),
         }
 
-    if http_method == "PUT":
+    if http_method == "GET":
+        return get_reservation(reservation_id)
+    elif http_method == "DELETE":
+        try:
+            payload = json.loads(event.get("body", "{}"))
+        except Exception as e:
+            return {
+                "statusCode": 400,
+                "body": json.dumps(
+                    {"message": "Invalid JSON", "error": str(e)}
+                ),
+            }
+        return delete_reservation(reservation_id)
+    elif http_method == "PUT":
         try:
             payload = json.loads(event.get("body", "{}"))
         except Exception as e:

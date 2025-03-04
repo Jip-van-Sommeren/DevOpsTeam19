@@ -35,46 +35,46 @@ def get_item(item_id):
         }
 
 
-def create_item(item_id, payload):
+def delete_item(item_id):
     try:
         with conn.cursor() as cur:
-            # Check if the item already exists
-            cur.execute("SELECT id FROM items WHERE id = %s;", (item_id,))
-            if cur.fetchone():
-                return {
-                    "statusCode": 409,
-                    "body": json.dumps({"message": "Item already exists"}),
-                }
+            # Attempt to delete the item and return its details
             cur.execute(
-                "INSERT INTO items (id, name, description) VALUES  \
-                    (%s, %s, %s) RETURNING id, name, description;",
-                (item_id, payload.get("name"), payload.get("description")),
+                "DELETE FROM items WHERE id = %s RETURNING  \
+                    id, name, description;",
+                (item_id,),
             )
-            new_item = cur.fetchone()
+            deleted_item = cur.fetchone()
+            if not deleted_item:
+                # If no row was deleted, the item does not exist
+                return {
+                    "statusCode": 404,
+                    "body": json.dumps({"message": "Item not found"}),
+                }
             conn.commit()
         return {
-            "statusCode": 201,
+            "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(
                 {
-                    "id": new_item[0],
-                    "name": new_item[1],
-                    "description": new_item[2],
+                    "id": deleted_item[0],
+                    "name": deleted_item[1],
+                    "description": deleted_item[2],
                 }
             ),
         }
     except Exception as e:
         conn.rollback()
-        print("Error in create_item:", str(e))
+        print("Error in delete_item:", str(e))
         return {
             "statusCode": 500,
             "body": json.dumps(
-                {"message": "Error creating item", "error": str(e)}
+                {"message": "Error deleting item", "error": str(e)}
             ),
         }
 
 
-def update_item(item_id, payload):
+def update_item(item_id: str, payload: dict[str, str]) -> dict:
     try:
         with conn.cursor() as cur:
             cur.execute(
@@ -128,7 +128,7 @@ def lambda_handler(event, context):
 
     if http_method == "GET":
         return get_item(item_id)
-    elif http_method == "POST":
+    elif http_method == "DELETE":
         try:
             payload = json.loads(event.get("body", "{}"))
         except Exception as e:
@@ -138,7 +138,7 @@ def lambda_handler(event, context):
                     {"message": "Invalid JSON", "error": str(e)}
                 ),
             }
-        return create_item(item_id, payload)
+        return delete_item(item_id)
     elif http_method == "PUT":
         try:
             payload = json.loads(event.get("body", "{}"))
