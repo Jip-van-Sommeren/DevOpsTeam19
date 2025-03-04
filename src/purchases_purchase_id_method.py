@@ -42,7 +42,12 @@ def get_purchase(purchase_id):
 def delete_purchase(purchase_id):
     try:
         with conn.cursor() as cur:
-            # Attempt to delete the purchase and return its details
+            # First, delete rows in purchased_items that reference this purchase_id
+            cur.execute(
+                "DELETE FROM purchased_items WHERE purchase_id = %s;",
+                (purchase_id,),
+            )
+            # Then, delete the purchase and return its details
             cur.execute(
                 "DELETE FROM purchases WHERE id = %s RETURNING id, name, description;",
                 (purchase_id,),
@@ -52,7 +57,7 @@ def delete_purchase(purchase_id):
                 # If no row was deleted, the purchase does not exist
                 return {
                     "statusCode": 404,
-                    "body": json.dumps({"message": "purchase not found"}),
+                    "body": json.dumps({"message": "Purchase not found"}),
                 }
             conn.commit()
         return {

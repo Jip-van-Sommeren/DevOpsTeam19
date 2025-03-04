@@ -11,7 +11,7 @@ def get_reservations():
     """
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT id, name FROM reservations;")
+            cur.execute("SELECT id, status FROM reservations;")
             reservations = cur.fetchall()
         return {
             "statusCode": 200,
@@ -38,13 +38,9 @@ def add_reservation(reservation):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO reservations (name, description, price) VALUES \
-                    (%s, %s, %s) RETURNING id, name, description, price;",
-                (
-                    reservation["name"],
-                    reservation["description"],
-                    reservation["price"],
-                ),
+                "INSERT INTO reservations (status, user_id) VALUES \
+                    (%s, %s) RETURNING id, status, user_id;",
+                (reservation["status"], reservation["user_id"]),
             )
             new_reservation = cur.fetchone()
             conn.commit()
@@ -88,6 +84,14 @@ def lambda_handler(event, context):
                             "message": "Invalid JSON in request body",
                             "error": str(e),
                         }
+                    ),
+                }
+            # Check for the required user_id field
+            if "user_id" not in reservation:
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps(
+                        {"message": "Missing required field: user_id"}
                     ),
                 }
             return add_reservation(reservation)
