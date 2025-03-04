@@ -8,7 +8,8 @@ def get_location(location_id):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, name, description FROM locations WHERE id = %s;",
+                "SELECT id, address, zip_code, city, street,  \
+                 state, number, addition, type FROM locations WHERE id = %s;",
                 (location_id,),
             )
             location = cur.fetchone()
@@ -44,7 +45,7 @@ def delete_location(location_id):
         with conn.cursor() as cur:
             # Attempt to delete the location and return its details
             cur.execute(
-                "DELETE FROM locations WHERE id = %s RETURNING id, name, description;",
+                "DELETE FROM locations WHERE id = %s RETURNING id;",
                 (location_id,),
             )
             deleted_location = cur.fetchone()
@@ -77,13 +78,42 @@ def delete_location(location_id):
         }
 
 
-def update_location(location_id: str, payload: dict[str, str]) -> dict:
+def update_location(location_id: str, payload) -> dict:
+    """
+    address TEXT NOT NULL,
+    zip_code TEXT NOT NULL,
+    city TEXT NOT NULL,
+    street TEXT NOT NULL,
+    state TEXT NOT NULL,
+    number INTEGER NOT NULL,
+    addition TEXT,
+    type TEXT NOT NULL
+
+
+    Args:
+        location_id (str): _description_
+        payload (_type_): _description_
+
+    Returns:
+        dict: _description_
+    """
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE locations SET name = %s, description = %s WHERE id = %s \
-                    RETURNING id, name, description;",
-                (payload.get("name"), payload.get("description"), location_id),
+                "UPDATE locations SET address = %s, zip_code = %s, city = %s, \
+                street = %s, state = %s, number = %s, addition = %s,  \
+                type = %s  WHERE id = %s RETURNING id, name, description;",
+                (
+                    payload.get("address"),
+                    payload.get("zip_code"),
+                    payload.get("city"),
+                    payload.get("street"),
+                    payload.get("state"),
+                    payload.get("number"),
+                    payload.get("addition"),
+                    payload.get("type"),
+                    location_id,
+                ),
             )
             updated_location = cur.fetchone()
             if not updated_location:

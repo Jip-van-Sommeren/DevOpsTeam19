@@ -7,9 +7,10 @@ conn = get_connection()
 
 def get_items(location_id):
     try:
-        with conn.cursor() as cur:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
-                "SELECT id, name, description FROM locations WHERE id = %s;",
+                "SELECT id, item_id, location_id, quantity FROM item_stock \
+                    WHERE location_id = %s;",
                 (location_id,),
             )
             location = cur.fetchall()

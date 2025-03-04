@@ -11,7 +11,10 @@ def get_location():
     """
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT id, name FROM location;")
+            cur.execute(
+                "SELECT address, zip_code, city, street,  \
+                 state, number, addition, type FROM location;"
+            )
             location = cur.fetchall()
         return {
             "statusCode": 200,
@@ -28,31 +31,64 @@ def get_location():
         }
 
 
-def add_item(item):
+def add_location(location):
     """
-    Inserts a new item into the database.
-    Expects `item` to be a dict with at least a 'name' key.
+    Inserts a new location into the database.
+    Expects `location` to be a dict with at least a 'name' key.
+        address TEXT NOT NULL,
+    zip_code TEXT NOT NULL,
+    city TEXT NOT NULL,
+    street TEXT NOT NULL,
+    state TEXT NOT NULL,
+    number INTEGER NOT NULL,
+    addition TEXT,
+    type TEXT NOT NULL
     """
+    loc_type = location.get("type")
+    if loc_type not in ["warehouse", "store"]:
+        return {
+            "statusCode": 400,
+            "body": json.dumps(
+                {
+                    "message": "Invalid location type",
+                    "error": f"Location type must be one of 'warehouse' or \
+                        'store'  Got '{loc_type}'",
+                }
+            ),
+        }
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "INSERT INTO location (name) VALUES (%s) RETURNING id, name;",
-                (item["name"],),
+                "INSERT INTO location (address, zip_code, city, street,  \
+                 state, number, addition, type) VALUES                   \
+                 (%s, %s, %s, %s, %s, %s, %s, %s)                        \
+                 RETURNING id, address, zip_code, city, street,          \
+                 state, number, addition, type;",
+                (
+                    location["address"],
+                    location["zip_code"],
+                    location["city"],
+                    location["street"],
+                    location["state"],
+                    location["number"],
+                    location.get("addition"),
+                    loc_type,
+                ),
             )
-            new_item = cur.fetchone()
+            new_location = cur.fetchone()
             conn.commit()
         return {
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(new_item),
+            "body": json.dumps(new_location),
         }
     except Exception as e:
         conn.rollback()
-        print("Error adding item:", str(e))
+        print("Error adding location:", str(e))
         return {
             "statusCode": 500,
             "body": json.dumps(
-                {"message": "Error adding item", "error": str(e)}
+                {"message": "Error adding location", "error": str(e)}
             ),
         }
 
@@ -70,9 +106,9 @@ def lambda_handler(event, context):
         if http_method == "GET":
             return get_location()
         elif http_method == "POST":
-            # Expect the request body to contain JSON data for the new item
+            # Expect the request body to contain JSON data for the new location
             try:
-                item = json.loads(event.get("body", "{}"))
+                location = json.loads(event.get("body", "{}"))
             except Exception as e:
                 return {
                     "statusCode": 400,
@@ -83,7 +119,7 @@ def lambda_handler(event, context):
                         }
                     ),
                 }
-            return add_item(item)
+            return add_location(location)
 
     # If the request doesn't match any endpoint, return 404
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}

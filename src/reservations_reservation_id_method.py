@@ -8,7 +8,8 @@ def get_reservation(reservation_id):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, name, description FROM reservations WHERE id = %s;",
+                "SELECT id, name, description FROM reservations \
+                    WHERE id = %s;",
                 (reservation_id,),
             )
             reservation = cur.fetchone()
@@ -44,7 +45,8 @@ def delete_reservation(reservation_id):
         with conn.cursor() as cur:
             # Attempt to delete the reservation and return its details
             cur.execute(
-                "DELETE FROM reservations WHERE id = %s RETURNING id, name, description;",
+                "DELETE FROM reservations WHERE id = %s RETURNING id, \
+                    name, description;",
                 (reservation_id,),
             )
             deleted_reservation = cur.fetchone()
@@ -81,8 +83,8 @@ def update_reservation(reservation_id: str, payload: dict[str, str]) -> dict:
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE reservations SET name = %s, description = %s WHERE id = %s \
-                    RETURNING id, name, description;",
+                "UPDATE reservations SET name = %s, description = %s WHERE \
+                    id = %s  RETURNING id, name, description;",
                 (
                     payload.get("name"),
                     payload.get("description"),

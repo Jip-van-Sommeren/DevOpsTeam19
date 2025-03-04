@@ -42,14 +42,16 @@ def get_purchase(purchase_id):
 def delete_purchase(purchase_id):
     try:
         with conn.cursor() as cur:
-            # First, delete rows in purchased_items that reference this purchase_id
+            # First, delete rows in purchased_items that
+            # reference this purchase_id
             cur.execute(
                 "DELETE FROM purchased_items WHERE purchase_id = %s;",
                 (purchase_id,),
             )
             # Then, delete the purchase and return its details
             cur.execute(
-                "DELETE FROM purchases WHERE id = %s RETURNING id, name, description;",
+                "DELETE FROM purchases WHERE id = %s RETURNING id,\
+                    name, description;",
                 (purchase_id,),
             )
             deleted_purchase = cur.fetchone()
@@ -86,8 +88,8 @@ def update_purchase(purchase_id: str, payload: dict[str, str]) -> dict:
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE purchases SET name = %s, description = %s WHERE id = %s \
-                    RETURNING id, name, description;",
+                "UPDATE purchases SET name = %s, description = %s \
+                    WHERE id = %s RETURNING id, name, description;",
                 (payload.get("name"), payload.get("description"), purchase_id),
             )
             updated_purchase = cur.fetchone()

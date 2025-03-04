@@ -73,7 +73,8 @@ def lambda_handler(event, context):
         if http_method == "GET":
             return get_reservations()
         elif http_method == "POST":
-            # Expect the request body to contain JSON data for the new reservation
+            # Expect the request body to contain JSON data for
+            # the new reservation
             try:
                 reservation = json.loads(event.get("body", "{}"))
             except Exception as e:

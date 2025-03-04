@@ -40,7 +40,8 @@ def delete_item(item_id):
         with conn.cursor() as cur:
             # Attempt to delete the item and return its details
             cur.execute(
-                "DELETE FROM items WHERE id = %s RETURNING id, name, description;",
+                "DELETE FROM items WHERE id = %s RETURNING  \
+                    id, name, description;",
                 (item_id,),
             )
             deleted_item = cur.fetchone()

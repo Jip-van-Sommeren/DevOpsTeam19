@@ -30,24 +30,61 @@ def get_purchases():
 
 def add_purchase(purchase):
     """
-    Inserts a new purchase into the database.
-    Expects `purchase` to be a dict with at least a 'name' key.
-    Optionally, it can include a 'description' key.
+    Inserts a new purchase into the database and its associated purchased
+    items.
+    Expects `purchase` to be a dict with at least 'user_id' and
+    'payment_token'.
+    Optionally, it can include an 'items' key, which should be a
+    list of objects each containing
+    'item_id' and 'quantity'.
     """
-    # Use a default description if not provided
     try:
         with conn.cursor() as cur:
+            # Insert into purchases table
             cur.execute(
-                "INSERT INTO purchases (name, description, price) VALUES \
-                    (%s, %s, %s) RETURNING id, name, description, price;",
-                (purchase["name"], purchase["description"], purchase["price"]),
+                "INSERT INTO purchases (user_id, payment_token) VALUES \
+                    (%s, %s) RETURNING id, user_id, payment_token;",
+                (purchase["user_id"], purchase["payment_token"]),
             )
             new_purchase = cur.fetchone()
+            purchase_id = new_purchase[0]
+
+            # If there are items in the payload, insert them into
+            # purchased_items table
+            items = purchase.get("items")
+            if items and isinstance(items, list):
+                for item in items:
+                    # Optionally, validate each item has both 'item_id'
+                    # and 'quantity'
+                    if "item_id" not in item or "quantity" not in item:
+                        raise Exception(
+                            "Each item must contain 'item_id' and 'quantity'"
+                        )
+                    cur.execute(
+                        "INSERT INTO purchased_items (purchase_id, item_id, \
+                            quantity) VALUES (%s, %s, %s);",
+                        (purchase_id, item["item_id"], item["quantity"]),
+                    )
+
+            # Commit the transaction after both insertions
             conn.commit()
+
+        # Prepare a response that includes the purchase details and
+        # the inserted items (if any)
+        response_body = {
+            "purchase": {
+                "id": new_purchase[0],
+                "user_id": new_purchase[1],
+                "payment_token": new_purchase[2],
+            }
+        }
+        if items:
+            response_body["items"] = items
+
         return {
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(new_purchase),
+            "body": json.dumps(response_body),
         }
     except Exception as e:
         conn.rollback()
