@@ -5,6 +5,4 @@ db_layer/python/**
 !db_layer/python/*.py
 
 .idea/
-venv
-DB_SCHEMA.txt
-__pycache__/
+venv/
