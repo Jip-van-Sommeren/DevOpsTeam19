@@ -1,5 +1,5 @@
 import json
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, execute_values
 from db_layer.db_connect import get_connection
 
 conn = get_connection()
@@ -30,24 +30,50 @@ def get_reservations():
 
 def add_reservation(reservation):
     """
-    Inserts a new reservation into the database.
-    Expects `reservation` to be a dict with at least a 'name' key.
-    Optionally, it can include a 'description' key.
+    Inserts a new reservation into the database and its associated reservationd items.
+    Expects `reservation` to be a dict with at least 'user_id' and 'payment_token'.
+    Optionally, it can include an 'items' key, which should be a list of objects each containing
+    'item_id' and 'quantity'.
     """
-    # Use a default description if not provided
     try:
         with conn.cursor() as cur:
+            # Insert into reservations table
             cur.execute(
-                "INSERT INTO reservations (status, user_id) VALUES \
-                    (%s, %s) RETURNING id, status, user_id;",
-                (reservation["status"], reservation["user_id"]),
+                "INSERT INTO reservations (user_id, status) VALUES (%s, %s) RETURNING id, user_id, status;",
+                (reservation["user_id"], "reserved"),
             )
             new_reservation = cur.fetchone()
+            reservation_id = new_reservation[0]
+
+            items = reservation.get("items", [])
+            inserted_items = []
+            if items:
+                values = [
+                    (reservation_id, item["item_id"], item["quantity"])
+                    for item in items
+                ]
+                sql = """
+                INSERT INTO reserved_items (reservation_id, item_id, quantity)
+                VALUES %s
+                RETURNING reservation_id, item_id, quantity;
+                """
+                execute_values(cur, sql, values)
+                inserted_items = cur.fetchall()
+
             conn.commit()
+
+        response_body = {
+            "reservation": {
+                "id": new_reservation[0],
+                "user_id": new_reservation[1],
+                "status": "reserved",
+            },
+            "items": inserted_items,
+        }
         return {
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(new_reservation),
+            "body": json.dumps(response_body),
         }
     except Exception as e:
         conn.rollback()

@@ -343,3 +343,37 @@ jobs:
             --handler reservations_methods.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update reservations_methods
+
+      ###################################################
+      # Package & Deploy stock_methods Lambda   #
+      ###################################################
+      - name: Package stock_methods function
+        run: |
+          cd src
+          zip -r stock_methods.zip stock_methods.py
+          cd ..
+      - name: Deploy stock_methods Lambda Function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          aws lambda update-function-code \
+            --function-name stock_methods \
+            --zip-file fileb://src/stock_methods.zip
+          check_update stock_methods
+      - name: Update stock_methods Function Configuration (set handler)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
+          aws lambda update-function-configuration \
+            --function-name stock_methods \
+            --handler stock_methods.lambda_handler \
+            --layers "$LATEST_LAYER"
+          check_update stock_methods

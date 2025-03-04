@@ -8,7 +8,7 @@ def get_reservation(reservation_id):
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, name, description FROM reservations \
+                "SELECT id, user_id FROM reservations \
                     WHERE id = %s;",
                 (reservation_id,),
             )
@@ -43,10 +43,15 @@ def get_reservation(reservation_id):
 def delete_reservation(reservation_id):
     try:
         with conn.cursor() as cur:
-            # Attempt to delete the reservation and return its details
+            # First, delete rows in reservationd_items that
+            # reference this reservation_id
             cur.execute(
-                "DELETE FROM reservations WHERE id = %s RETURNING id, \
-                    name, description;",
+                "DELETE FROM reserved_items WHERE reservation_id = %s;",
+                (reservation_id,),
+            )
+            # Then, delete the reservation and return its details
+            cur.execute(
+                "DELETE FROM reservations WHERE id = %s RETURNING id;",
                 (reservation_id,),
             )
             deleted_reservation = cur.fetchone()
