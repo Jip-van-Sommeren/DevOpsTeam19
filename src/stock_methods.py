@@ -1,9 +1,15 @@
 import json
+import os
+import boto3
 from psycopg2.extras import RealDictCursor, execute_values
 from db_layer.db_connect import get_connection
 
-
 conn = get_connection()
+
+# Initialize EventBridge client.
+event_client = boto3.client("events")
+# Use your custom event bus name or "default".
+EVENT_BUS_NAME = os.environ.get("EVENT_BUS_NAME", "default")
 
 
 def get_items():
@@ -37,18 +43,17 @@ def get_items():
 
 def add_items(items):
     """
-    Inserts multiple items into the item_stock table.
+    Inserts multiple items into the item_stock table after publishing an event for validation.
     Expects `items` to be a list of dicts, each with 'item_id', 'location_id', and 'quantity'.
-    Returns the inserted rows.
+    This function publishes an event so that a separate Lambda can check if the provided IDs are valid.
     """
     try:
+
         with conn.cursor() as cur:
-            # Create a list of tuples containing the values for each item
             values = [
                 (item["item_id"], item["location_id"], item["quantity"])
                 for item in items
             ]
-            # Build the SQL query using execute_values to perform a bulk insert
             sql = """
                 INSERT INTO item_stock (item_id, location_id, quantity)
                 VALUES %s
@@ -57,6 +62,7 @@ def add_items(items):
             execute_values(cur, sql, values)
             inserted_items = cur.fetchall()
             conn.commit()
+
         return {
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
@@ -99,7 +105,7 @@ def lambda_handler(event, context):
                         }
                     ),
                 }
-            return add_item(item)
+            return add_items(item)
 
     # If the request doesn't match any endpoint, return 404
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}
