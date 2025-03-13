@@ -11,7 +11,7 @@ def get_items():
     """
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SELECT id, name FROM items;")
+            cur.execute("SELECT id, name, description FROM items;")
             items = cur.fetchall()
         return {
             "statusCode": 200,
