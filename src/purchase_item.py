@@ -77,7 +77,7 @@ def lambda_handler(event, context):
     print("Received event:", event)
 
     try:
-        purchase_data = event.get("purchaseData")
+        purchase_data = event.get("data")
         # Update the purchased_items table
         return add_purchase(purchase_data)
 

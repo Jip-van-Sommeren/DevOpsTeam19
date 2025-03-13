@@ -9,23 +9,35 @@ conn = get_connection()
 
 # Initialize SNS client
 sns_client = boto3.client("sns")
-# You can set the SNS topic ARN as an environment variable, e.g.,
-# STOCK_ALERT_TOPIC_ARN
 SNS_TOPIC_ARN = os.environ.get("STOCK_ALERT_TOPIC_ARN")
 
 
-def update_stock_for_item(item):
+def update_stock_for_item(item, operation):
     """
-    Decreases the stock quantity for a given item.
+    Updates the stock quantity for a given item.
+    - For operation "deduct": subtracts the quantity.
+    - For operation "add": adds back the quantity.
     Expects `item` to be a dict with 'item_id' and 'quantity'.
+    Returns the updated row.
     """
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
-        # Update stock: subtract the quantity purchased.
-        cur.execute(
-            "UPDATE item_stock SET quantity = quantity - %s WHERE id = %s \
-                RETURNING id, quantity;",
-            (item["quantity"], item["item_id"]),
-        )
+        if operation == "deduct":
+            query = """
+                UPDATE item_stock
+                SET quantity = quantity - %s
+                WHERE id = %s
+                RETURNING id, quantity;
+            """
+        elif operation == "add":
+            query = """
+                UPDATE item_stock
+                SET quantity = quantity + %s
+                WHERE id = %s
+                RETURNING id, quantity;
+            """
+        else:
+            raise ValueError("Invalid operation. Expected 'deduct' or 'add'.")
+        cur.execute(query, (item["quantity"], item["item_id"]))
         updated = cur.fetchone()
     return updated
 
@@ -46,20 +58,22 @@ def send_stock_alert(item_id, stock):
 def lambda_handler(event, context):
     """
     Lambda handler to update inventory based on data passed from the state
-    machine. Expects the event to contain a list of purchased items
-    either as a top-level "items" key or nested under "detail".
+    machine.
+    Expects the event to contain:
+      - a nested "data" key with an "items" array,
+      - and an "operation" field indicating the update type ("deduct" for
+      purchases, "add" for cancellations).
     """
     print("Received event:", event)
 
     try:
-        # Try to extract items from the event.
-        items = event.get("items")
-        if items is None:
-            # If not found, attempt to retrieve from "detail".
-            detail = event.get("detail", {})
-            if isinstance(detail, str):
-                detail = json.loads(detail)
-            items = detail.get("items", [])
+        # Attempt to extract 'items' and 'operation' from the
+        # event under the 'data' key.
+        data = event.get("data", {})
+        items = data.get("items")
+        operation = data.get(
+            "operation", "deduct"
+        )  # default to 'deduct' if not specified
 
         if not items:
             raise ValueError("No items provided in the event input.")
@@ -68,22 +82,22 @@ def lambda_handler(event, context):
 
         # Begin a transaction to update stock for all items.
         for item in items:
-            updated = update_stock_for_item(item)
+            updated = update_stock_for_item(item, operation)
             if updated is None:
-                # Optionally, handle the case when an item is not found.
                 print(
-                    f"Item with ID {item['item_id']} not found or update \
-                        failed."
+                    f"Item with ID {item['item_id']} not found or \
+                        update failed."
                 )
             else:
                 updated_items.append(updated)
         conn.commit()
 
-        # Check if any updated item's stock is below 10 and send
-        # SNS notification.
-        for updated in updated_items:
-            if updated.get("stock", 0) < 10:
-                send_stock_alert(updated["id"], updated["stock"])
+        # If the operation is deducting stock, check for low stock and send
+        # SNS alerts.
+        if operation == "deduct":
+            for updated in updated_items:
+                if updated.get("quantity", 0) < 10:
+                    send_stock_alert(updated["id"], updated["quantity"])
 
         print("Stock updated for items:", updated_items)
         return {

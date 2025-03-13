@@ -34,7 +34,7 @@ def lambda_handler(event, context):
         # Adjust to match how your data is passed in.
         # If coming from Step Functions, event['reservation_id'] might be
         # in the top-level or nested under event['input'] or event['detail'].
-        reservation_id = event.get("reservation_id")
+        reservation_id = event.get("data").get("reservation_id")
         if not reservation_id:
             return {
                 "statusCode": 400,

@@ -88,11 +88,11 @@ def update_reservation(reservation_id: str, payload: dict[str, str]) -> dict:
     try:
         with conn.cursor() as cur:
             cur.execute(
-                "UPDATE reservations SET name = %s, description = %s WHERE \
-                    id = %s  RETURNING id, name, description;",
+                "UPDATE reservations SET user_id = %s, status = %s WHERE \
+                    id = %s  RETURNING id, name, status;",
                 (
                     payload.get("name"),
-                    payload.get("description"),
+                    payload.get("status"),
                     reservation_id,
                 ),
             )
@@ -143,27 +143,27 @@ def lambda_handler(event, context):
     if http_method == "GET":
         return get_reservation(reservation_id)
     elif http_method == "DELETE":
-        try:
-            payload = json.loads(event.get("body", "{}"))
-        except Exception as e:
-            return {
-                "statusCode": 400,
-                "body": json.dumps(
-                    {"message": "Invalid JSON", "error": str(e)}
-                ),
-            }
+        # try:
+        #     payload = json.loads(event.get("body", "{}"))
+        # except Exception as e:
+        #     return {
+        #         "statusCode": 400,
+        #         "body": json.dumps(
+        #             {"message": "Invalid JSON", "error": str(e)}
+        #         ),
+        #     }
         return delete_reservation(reservation_id)
-    elif http_method == "PUT":
-        try:
-            payload = json.loads(event.get("body", "{}"))
-        except Exception as e:
-            return {
-                "statusCode": 400,
-                "body": json.dumps(
-                    {"message": "Invalid JSON", "error": str(e)}
-                ),
-            }
-        return update_reservation(reservation_id, payload)
+    # elif http_method == "PUT":
+    #     try:
+    #         payload = json.loads(event.get("body", "{}"))
+    #     except Exception as e:
+    #         return {
+    #             "statusCode": 400,
+    #             "body": json.dumps(
+    #                 {"message": "Invalid JSON", "error": str(e)}
+    #             ),
+    #         }
+    #     return update_reservation(reservation_id, payload)
     else:
         return {
             "statusCode": 405,

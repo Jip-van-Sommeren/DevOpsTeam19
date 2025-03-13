@@ -32,7 +32,7 @@ def lambda_handler(event, context):
         # Adjust to match how your data is passed in.
         # If coming from Step Functions, event['purchase_id'] might be
         # in the top-level or nested under event['input'] or event['detail'].
-        purchase_id = event.get("purchase_id")
+        purchase_id = event.get("data").get("purchase_id")
         if not purchase_id:
             return {
                 "statusCode": 400,

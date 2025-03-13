@@ -4,6 +4,7 @@ import os
 
 # Initialize Step Functions client
 sfn_client = boto3.client("stepfunctions")
+STATE_MACHINE_ARN = os.environ.get("STATE_MACHINE_ARN")
 
 
 def lambda_handler(event, context):
@@ -23,22 +24,34 @@ def lambda_handler(event, context):
                     }
                 ),
             }
-        state_machine_input = json.dumps({"purchaseData": body})
+        body["stock_operation"] = "deduct"
+        state_machine_input = json.dumps({"data": body})
 
         # Start the execution of the state machine
-        response = sfn_client.start_execution(
-            stateMachineArn=os.environ.get("STATE_MACHINE_ARN"),
-            input=state_machine_input,
-        )
-        return {
-            "statusCode": 200,
-            "body": json.dumps(
-                {
-                    "message": "Saga triggered successfully",
-                    "executionArn": response.get("executionArn"),
-                }
-            ),
-        }
+        if STATE_MACHINE_ARN is not None:
+            response = sfn_client.start_execution(
+                stateMachineArn=STATE_MACHINE_ARN,
+                input=state_machine_input,
+            )
+            return {
+                "statusCode": 200,
+                "body": json.dumps(
+                    {
+                        "message": "Saga triggered successfully",
+                        "executionArn": response.get("executionArn"),
+                    }
+                ),
+            }
+        else:
+            return {
+                "statusCode": 500,
+                "body": json.dumps(
+                    {
+                        "message": "STATE_MACHINE_ARN environment \
+                            variable not set"
+                    }
+                ),
+            }
 
     # If the request doesn't match any endpoint, return 404
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}

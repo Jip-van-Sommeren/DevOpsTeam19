@@ -43,9 +43,12 @@ def get_items():
 
 def add_items(items):
     """
-    Inserts multiple items into the item_stock table after publishing an event for validation.
-    Expects `items` to be a list of dicts, each with 'item_id', 'location_id', and 'quantity'.
-    This function publishes an event so that a separate Lambda can check if the provided IDs are valid.
+    Inserts multiple items into the item_stock table after publishing an event
+    for validation.
+    Expects `items` to be a list of dicts, each with 'item_id', 'location_id',
+    and 'quantity'.
+    This function publishes an event so that a separate Lambda can check if
+    the provided IDs are valid.
     """
     try:
 
