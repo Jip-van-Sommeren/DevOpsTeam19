@@ -23,7 +23,8 @@ def lambda_handler(event, context):
                     }
                 ),
             }
-        state_machine_input = json.dumps({"purchaseData": body})
+        body["stock_operation"] = "deduct"
+        state_machine_input = json.dumps({"data": body})
 
         # Start the execution of the state machine
         response = sfn_client.start_execution(
