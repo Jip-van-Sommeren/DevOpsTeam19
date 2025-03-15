@@ -25,19 +25,30 @@ def update_stock_for_item(item, operation):
             query = """
                 UPDATE item_stock
                 SET quantity = quantity - %s
-                WHERE id = %s
+                WHERE item_id = %s AND location_id = %s
                 RETURNING id, quantity;
             """
         elif operation == "add":
             query = """
                 UPDATE item_stock
                 SET quantity = quantity + %s
-                WHERE id = %s
+                WHERE item_id = %s AND location_id = %s
+                RETURNING id, quantity;
+            """
+        elif operation == "reset":
+            query = """
+                UPDATE item_stock
+                SET quantity = %s
+                WHERE item_id = %s AND location_id = %s
                 RETURNING id, quantity;
             """
         else:
-            raise ValueError("Invalid operation. Expected 'deduct' or 'add'.")
-        cur.execute(query, (item["quantity"], item["item_id"]))
+            raise ValueError(
+                "Invalid operation. Expected 'deduct', 'add' 'reset."
+            )
+        cur.execute(
+            query, (item["quantity"], item["item_id"], item["location_id"])
+        )
         updated = cur.fetchone()
     return updated
 
@@ -74,7 +85,6 @@ def lambda_handler(event, context):
         operation = data.get(
             "operation", "deduct"
         )  # default to 'deduct' if not specified
-
         if not items:
             raise ValueError("No items provided in the event input.")
 

@@ -8,3 +8,4 @@ db_layer/python/**
 venv
 DB_SCHEMA.txt
 __pycache__/
+/old

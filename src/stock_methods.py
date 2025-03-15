@@ -1,31 +1,45 @@
 import json
-import os
-import boto3
 from psycopg2.extras import RealDictCursor, execute_values
 from db_layer.db_connect import get_connection
 
 conn = get_connection()
 
 # Initialize EventBridge client.
-event_client = boto3.client("events")
-# Use your custom event bus name or "default".
-EVENT_BUS_NAME = os.environ.get("EVENT_BUS_NAME", "default")
 
 
-def get_items():
+def get_items(event):
     """
-    Retrieves a list of items from the database.
-        id SERIAL PRIMARY KEY,
-    item_id INTEGER NOT NULL REFERENCES items(id),
-    location_id INTEGER NOT NULL REFERENCES location(id),
-    quantity INTEGER NOT NULL DEFAULT 0
+    Retrieves a list of items from the database with pagination.
+    Expects query string parameters "skip" and "limit" for pagination.
+    Defaults: skip=0, limit=100.
     """
     try:
+        # Extract query parameters (if any)
+        query_params = event.get("queryStringParameters") or {}
+        try:
+            skip = int(query_params.get("skip", 0))
+            limit = int(query_params.get("limit", 100))
+        except ValueError:
+            skip = 0
+            limit = 100
+        if limit > 1000:
+            limit = 1000
+        location_id = query_params.get("location_id")
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                "SELECT id, item_id, location_id, quantity FROM item_stock;"
-            )
+            if location_id is None:
+                cur.execute(
+                    "SELECT id, item_id, location_id, quantity FROM item_stock\
+                        OFFSET %s LIMIT %s;",
+                    (skip, limit),
+                )
+            else:
+                cur.execute(
+                    "SELECT id, item_id, location_id, quantity FROM item_stock\
+                        WHERE location_id = %s OFFSET %s LIMIT %s;",
+                    (location_id, skip, limit),
+                )
             items = cur.fetchall()
+
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
@@ -91,9 +105,9 @@ def lambda_handler(event, context):
     resource = event.get("resource", "")
 
     # Route for /items endpoint
-    if resource == "/items":
+    if resource == "/stock":
         if http_method == "GET":
-            return get_items()
+            return get_items(event)
         elif http_method == "POST":
             # Expect the request body to contain JSON data for the new item
             try:
