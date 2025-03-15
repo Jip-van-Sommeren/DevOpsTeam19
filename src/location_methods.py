@@ -5,21 +5,37 @@ from db_layer.db_connect import get_connection
 conn = get_connection()
 
 
-def get_location():
+def get_location(event):
     """
-    Retrieves a list of location from the database.
+    Retrieves a list of locations from the database with pagination.
+    Expects query string parameters "skip" and "limit" for pagination.
+    Defaults: skip=0, limit=100.
     """
     try:
+        query_params = event.get("queryStringParameters") or {}
+        try:
+            skip = int(query_params.get("skip", 0))
+            limit = int(query_params.get("limit", 100))
+        except ValueError:
+            skip = 0
+            limit = 100
+
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
-                "SELECT address, zip_code, city, street,  \
-                 state, number, addition, type FROM location;"
+                """
+                SELECT address, zip_code, city, street, state, number,\
+                    addition, type
+                FROM location
+                OFFSET %s LIMIT %s;
+                """,
+                (skip, limit),
             )
-            location = cur.fetchall()
+            locations = cur.fetchall()
+
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(location),
+            "body": json.dumps(locations),
         }
     except Exception as e:
         print("Error fetching location:", str(e))
@@ -104,7 +120,7 @@ def lambda_handler(event, context):
     # Route for /location endpoint
     if resource == "/location":
         if http_method == "GET":
-            return get_location()
+            return get_location(event)
         elif http_method == "POST":
             # Expect the request body to contain JSON data for the new location
             try:

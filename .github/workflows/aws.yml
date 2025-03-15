@@ -247,70 +247,70 @@ jobs:
       ###################################################
       # Package & Deploy reservations_reservation_id_method Lambda   #
       ###################################################
-      - name: Package reservations_reservation_id_method function
-        run: |
-          cd src
-          zip -r reservations_reservation_id_method.zip reservations_reservation_id_method.py
-          cd ..
-      - name: Deploy reservations_reservation_id_method Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name reservations_reservation_id_method \
-            --zip-file fileb://src/reservations_reservation_id_method.zip
-          check_update reservations_reservation_id_method
-      - name: Update reservations_reservation_id_method Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name reservations_reservation_id_method \
-            --handler reservations_reservation_id_method.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update reservations_reservation_id_method
+      # - name: Package reservations_reservation_id_method function
+      #   run: |
+      #     cd src
+      #     zip -r reservations_reservation_id_method.zip reservations_reservation_id_method.py
+      #     cd ..
+      # - name: Deploy reservations_reservation_id_method Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name reservations_reservation_id_method \
+      #       --zip-file fileb://src/reservations_reservation_id_method.zip
+      #     check_update reservations_reservation_id_method
+      # - name: Update reservations_reservation_id_method Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name reservations_reservation_id_method \
+      #       --handler reservations_reservation_id_method.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update reservations_reservation_id_method
 
       ###################################################
       # Package & Deploy reservations_methods Lambda   #
       ###################################################
-      - name: Package reservations_methods function
-        run: |
-          cd src
-          zip -r reservations_methods.zip reservations_methods.py
-          cd ..
-      - name: Deploy reservations_methods Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name reservations_methods \
-            --zip-file fileb://src/reservations_methods.zip
-          check_update reservations_methods
-      - name: Update reservations_methods Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name reservations_methods \
-            --handler reservations_methods.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update reservations_methods
+      # - name: Package reservations_methods function
+      #   run: |
+      #     cd src
+      #     zip -r reservations_methods.zip reservations_methods.py
+      #     cd ..
+      # - name: Deploy reservations_methods Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name reservations_methods \
+      #       --zip-file fileb://src/reservations_methods.zip
+      #     check_update reservations_methods
+      # - name: Update reservations_methods Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name reservations_methods \
+      #       --handler reservations_methods.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update reservations_methods
 
       ###################################################
       # Package & Deploy stock_methods Lambda   #
@@ -349,36 +349,36 @@ jobs:
       ###################################################
       # Package & Deploy invokeReservationStep Lambda   #
       ###################################################
-      - name: Package invokeReservationStep function
-        run: |
-          cd src
-          zip -r invokeReservationStep.zip invoke_reservation_step.py
-          cd ..
-      - name: Deploy invokeReservationStep Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name invokeReservationStep \
-            --zip-file fileb://src/invokeReservationStep.zip
-          check_update invokeReservationStep
-      - name: Update invokeReservationStep Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name invokeReservationStep \
-            --handler invokeReservationStep.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update invokeReservationStep
+      # - name: Package invokeReservationStep function
+      #   run: |
+      #     cd src
+      #     zip -r invokeReservationStep.zip invoke_reservation_step.py
+      #     cd ..
+      # - name: Deploy invokeReservationStep Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name invokeReservationStep \
+      #       --zip-file fileb://src/invokeReservationStep.zip
+      #     check_update invokeReservationStep
+      # - name: Update invokeReservationStep Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name invokeReservationStep \
+      #       --handler invokeReservationStep.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update invokeReservationStep
 
       ###################################################
       # Package & Deploy invokePurchaseStep Lambda   #
@@ -451,36 +451,36 @@ jobs:
       ###################################################
       # Package & Deploy reservation_post Lambda   #
       ###################################################
-      - name: Package reservation_post function
-        run: |
-          cd src
-          zip -r reservation_post.zip reservation_item.py
-          cd ..
-      - name: Deploy reservation_post Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name reservation_post \
-            --zip-file fileb://src/reservation_post.zip
-          check_update reservation_post
-      - name: Update reservation_post Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name reservation_post \
-            --handler reservation_post.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update reservation_post
+      # - name: Package reservation_post function
+      #   run: |
+      #     cd src
+      #     zip -r reservation_post.zip reservation_item.py
+      #     cd ..
+      # - name: Deploy reservation_post Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name reservation_post \
+      #       --zip-file fileb://src/reservation_post.zip
+      #     check_update reservation_post
+      # - name: Update reservation_post Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name reservation_post \
+      #       --handler reservation_post.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update reservation_post
 
       ###################################################
       # Package & Deploy updateStockLambda Lambda   #
@@ -553,46 +553,80 @@ jobs:
       ###################################################
       # Package & Deploy deleteReservation Lambda   #
       ###################################################
-      - name: Package deleteReservation function
-        run: |
-          cd src
-          zip -r deleteReservation.zip reservation_error.py
-          cd ..
-      - name: Deploy deleteReservation Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name deleteReservation \
-            --zip-file fileb://src/deleteReservation.zip
-          check_update deleteReservation
-      - name: Update deleteReservation Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name deleteReservation \
-            --handler deleteReservation.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update deleteReservation
+      # - name: Package deleteReservation function
+      #   run: |
+      #     cd src
+      #     zip -r deleteReservation.zip reservation_error.py
+      #     cd ..
+      # - name: Deploy deleteReservation Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name deleteReservation \
+      #       --zip-file fileb://src/deleteReservation.zip
+      #     check_update deleteReservation
+      # - name: Update deleteReservation Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name deleteReservation \
+      #       --handler deleteReservation.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update deleteReservation
 
       ###################################################
       # Package & Deploy reservation_reservation_id_put Lambda   #
       ###################################################
-      - name: Package reservation_reservation_id_put function
+      # - name: Package reservation_reservation_id_put function
+      #   run: |
+      #     cd src
+      #     zip -r reservation_reservation_id_put.zip reservation_reservation_id_put.py
+      #     cd ..
+      # - name: Deploy reservation_reservation_id_put Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name reservation_reservation_id_put \
+      #       --zip-file fileb://src/reservation_reservation_id_put.zip
+      #     check_update reservation_reservation_id_put
+      # - name: Update reservation_reservation_id_put Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name reservation_reservation_id_put \
+      #       --handler reservation_reservation_id_put.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update reservation_reservation_id_put
+
+      ###################################################
+      # Package & Deploy stock_items_id_method Lambda   #
+      ###################################################
+      - name: Package stock_items_id_method function
         run: |
           cd src
-          zip -r reservation_reservation_id_put.zip reservation_reservation_id_put.py
+          zip -r stock_items_id_method.zip stock_item_id_methods.py
           cd ..
-      - name: Deploy reservation_reservation_id_put Lambda Function
+      - name: Deploy stock_items_id_method Lambda Function
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -600,10 +634,10 @@ jobs:
         run: |
           source scripts/check_update.sh
           aws lambda update-function-code \
-            --function-name reservation_reservation_id_put \
-            --zip-file fileb://src/reservation_reservation_id_put.zip
-          check_update reservation_reservation_id_put
-      - name: Update reservation_reservation_id_put Function Configuration (set handler)
+            --function-name stock_items_id_method \
+            --zip-file fileb://src/stock_items_id_method.zip
+          check_update stock_items_id_method
+      - name: Update stock_items_id_method Function Configuration (set handler)
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -613,7 +647,75 @@ jobs:
           LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
-            --function-name reservation_reservation_id_put \
-            --handler reservation_reservation_id_put.lambda_handler \
+            --function-name stock_items_id_method \
+            --handler stock_items_id_method.lambda_handler \
             --layers "$LATEST_LAYER"
-          check_update reservation_reservation_id_put
+          check_update stock_items_id_method
+
+      ###################################################
+      # Package & Deploy purchase_put Lambda   #
+      ###################################################
+      - name: Package purchase_put function
+        run: |
+          cd src
+          zip -r purchase_put.zip update_purchase.py
+          cd ..
+      - name: Deploy purchase_put Lambda Function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          aws lambda update-function-code \
+            --function-name purchase_put \
+            --zip-file fileb://src/purchase_put.zip
+          check_update purchase_put
+      - name: Update purchase_put Function Configuration (set handler)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
+          aws lambda update-function-configuration \
+            --function-name purchase_put \
+            --handler purchase_put.lambda_handler \
+            --layers "$LATEST_LAYER"
+          check_update purchase_put
+
+      ###################################################
+      # Package & Deploy invokePurchaseUpdate Lambda   #
+      ###################################################
+      - name: Package invokePurchaseUpdate function
+        run: |
+          cd src
+          zip -r invokePurchaseUpdate.zip invoke_purchase_update.py
+          cd ..
+      - name: Deploy invokePurchaseUpdate Lambda Function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          aws lambda update-function-code \
+            --function-name invokePurchaseUpdate \
+            --zip-file fileb://src/invokePurchaseUpdate.zip
+          check_update invokePurchaseUpdate
+      - name: Update invokePurchaseUpdate Function Configuration (set handler)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
+          aws lambda update-function-configuration \
+            --function-name invokePurchaseUpdate \
+            --handler invokePurchaseUpdate.lambda_handler \
+            --layers "$LATEST_LAYER"
+          check_update invokePurchaseUpdate
