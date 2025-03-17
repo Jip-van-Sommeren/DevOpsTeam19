@@ -1,6 +1,7 @@
 import os
 import psycopg2
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 def return_engine():
@@ -17,6 +18,19 @@ def return_engine():
     # e.g., "postgresql://user:password@host:port/dbname"
 
     return create_engine(DATABASE_URL)
+
+
+engine = return_engine()
+
+# Create a sessionmaker bound to the engine
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_session():
+    """
+    Returns a new session instance.
+    """
+    return SessionLocal()
 
 
 def get_connection():
