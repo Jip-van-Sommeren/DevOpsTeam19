@@ -652,70 +652,70 @@ jobs:
             --layers "$LATEST_LAYER"
           check_update stock_items_id_method
 
-      ###################################################
-      # Package & Deploy purchase_put Lambda   #
-      ###################################################
-      - name: Package purchase_put function
-        run: |
-          cd src
-          zip -r purchase_put.zip update_purchase.py
-          cd ..
-      - name: Deploy purchase_put Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name purchase_put \
-            --zip-file fileb://src/purchase_put.zip
-          check_update purchase_put
-      - name: Update purchase_put Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name purchase_put \
-            --handler purchase_put.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update purchase_put
+      # ###################################################
+      # # Package & Deploy purchase_put Lambda   #
+      # ###################################################
+      # - name: Package purchase_put function
+      #   run: |
+      #     cd src
+      #     zip -r purchase_put.zip update_purchase.py
+      #     cd ..
+      # - name: Deploy purchase_put Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name purchase_put \
+      #       --zip-file fileb://src/purchase_put.zip
+      #     check_update purchase_put
+      # - name: Update purchase_put Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name purchase_put \
+      #       --handler purchase_put.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update purchase_put
 
-      ###################################################
-      # Package & Deploy invokePurchaseUpdate Lambda   #
-      ###################################################
-      - name: Package invokePurchaseUpdate function
-        run: |
-          cd src
-          zip -r invokePurchaseUpdate.zip invoke_purchase_update.py
-          cd ..
-      - name: Deploy invokePurchaseUpdate Lambda Function
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          aws lambda update-function-code \
-            --function-name invokePurchaseUpdate \
-            --zip-file fileb://src/invokePurchaseUpdate.zip
-          check_update invokePurchaseUpdate
-      - name: Update invokePurchaseUpdate Function Configuration (set handler)
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        run: |
-          source scripts/check_update.sh
-          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
-          echo "Using latest layer ARN: $LATEST_LAYER"
-          aws lambda update-function-configuration \
-            --function-name invokePurchaseUpdate \
-            --handler invokePurchaseUpdate.lambda_handler \
-            --layers "$LATEST_LAYER"
-          check_update invokePurchaseUpdate
+      # ###################################################
+      # # Package & Deploy invokePurchaseUpdate Lambda   #
+      # ###################################################
+      # - name: Package invokePurchaseUpdate function
+      #   run: |
+      #     cd src
+      #     zip -r invokePurchaseUpdate.zip invoke_purchase_update.py
+      #     cd ..
+      # - name: Deploy invokePurchaseUpdate Lambda Function
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     aws lambda update-function-code \
+      #       --function-name invokePurchaseUpdate \
+      #       --zip-file fileb://src/invokePurchaseUpdate.zip
+      #     check_update invokePurchaseUpdate
+      # - name: Update invokePurchaseUpdate Function Configuration (set handler)
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      #   run: |
+      #     source scripts/check_update.sh
+      #     LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+      #     echo "Using latest layer ARN: $LATEST_LAYER"
+      #     aws lambda update-function-configuration \
+      #       --function-name invokePurchaseUpdate \
+      #       --handler invokePurchaseUpdate.lambda_handler \
+      #       --layers "$LATEST_LAYER"
+      #     check_update invokePurchaseUpdate
