@@ -106,9 +106,22 @@
 
 #     # If the request doesn't match any endpoint, return 404
 #     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}
+
+
 import json
+import os
+import boto3
+import base64
+import uuid
 from db_layer.db_connect import get_session
-from db_layer.basemodels import Item
+from db_layer.generate_s3_url import generate_presigned_url
+from db_layer.basemodels import (
+    Item,
+)  # Assuming you have an ORM model named Item
+
+# Initialize S3 client and get the bucket name from environment variables
+s3_client = boto3.client("s3")
+S3_BUCKET = os.environ.get("S3_BUCKET")
 
 
 def get_items(event):
@@ -137,6 +150,7 @@ def get_items(event):
                 "name": item.name,
                 "description": item.description,
                 "price": item.price,
+                "image_url": generate_presigned_url(S3_BUCKET, item.s3_key),
             }
             for item in items
         ]
@@ -160,11 +174,13 @@ def get_items(event):
 def add_item(item):
     """
     Inserts a new item into the database.
-    Expects `item` to be a dict with at least a 'name' key.
-    Optionally, it can include a 'description' key and a 'price'.
+    Expects `item` to be a dict with at least 'name' and 'price'.
+    Optionally, it can include a 'description' key and a base64-encoded 'image_data'.
+    If image_data is provided, the image is uploaded to S3 and its URL is added to the response.
     """
     session = get_session()
     try:
+        # Create the new item record (adjust attributes as needed)
         new_item = Item(
             name=item["name"],
             description=item.get("description", ""),
@@ -172,13 +188,34 @@ def add_item(item):
         )
         session.add(new_item)
         session.commit()
-        session.refresh(new_item)  # Retrieve generated id and other defaults.
+        session.refresh(new_item)  # Retrieve generated id and defaults
+
+        # Check if image data is provided in the payload.
+        if "image_data" in item:
+            # Decode the base64 image data.
+            image_data = base64.b64decode(item["image_data"])
+            # Generate a unique key for the image file in S3.
+            s3_key = f"items/{new_item.id}_{uuid.uuid4().hex}.jpg"
+            # Upload the image to S3.
+            s3_client.put_object(
+                Bucket=S3_BUCKET,
+                Key=s3_key,
+                Body=image_data,
+                ContentType="image/jpeg",
+            )
+            # Build a public URL for the uploaded image.
+            # image_url = f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}"
+
+        # Build response item.
         response_item = {
             "id": new_item.id,
             "name": new_item.name,
             "description": new_item.description,
             "price": new_item.price,
         }
+        if s3_key:
+            response_item["s3_key"] = s3_key
+
         return {
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
@@ -208,9 +245,12 @@ def lambda_handler(event, context):
     # Route for /items endpoint.
     if resource == "/items":
         if http_method == "GET":
-            return get_items(event)
+            return get_items(
+                event
+            )  # Assumes you have a get_items function that accepts event
         elif http_method == "POST":
             try:
+                # Expect the request body to contain JSON data for the new item.
                 item = json.loads(event.get("body", "{}"))
             except Exception as e:
                 return {

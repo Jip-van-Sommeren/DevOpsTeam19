@@ -67,6 +67,7 @@ class Item(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     price = Column(Integer, nullable=False)
+    s3_key = Column(String)
 
 
 """
