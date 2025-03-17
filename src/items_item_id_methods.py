@@ -160,6 +160,10 @@
 import json
 from db_layer.db_connect import get_session
 from db_layer.basemodels import Item
+from db_layer.generate_s3_url import generate_presigned_url
+import os
+
+S3_BUCKET = os.environ.get("S3_BUCKET")
 
 
 def get_item(item_id):
@@ -171,6 +175,8 @@ def get_item(item_id):
                 "id": item.id,
                 "name": item.name,
                 "description": item.description,
+                "price": item.price,
+                "image_url": generate_presigned_url(S3_BUCKET, item.s3_key),
             }
             return {
                 "statusCode": 200,

@@ -90,7 +90,6 @@
 #         # Return an error structure. Alternatively, you can let the error
 #         # propagate to trigger a Catch in the state machine.
 #         raise e
-import json
 from db_layer.db_connect import get_session
 from db_layer.basemodels import Reservation, ReservedItem
 
