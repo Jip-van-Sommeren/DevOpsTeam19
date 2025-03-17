@@ -88,6 +88,47 @@ def delete_purchase(purchase_id):
         }
 
 
+def update_purchase(purchase_id: str, payload: dict[str, str]) -> dict:
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE purchases SET user_id = %s, status = %s WHERE \
+                    id = %s  RETURNING id, status;",
+                (
+                    payload.get("user_id"),
+                    payload.get("status"),
+                    purchase_id,
+                ),
+            )
+            updated_purchase = cur.fetchone()
+            if not updated_purchase:
+                return {
+                    "statusCode": 404,
+                    "body": json.dumps({"message": "purchase not found"}),
+                }
+            conn.commit()
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps(
+                {
+                    "id": updated_purchase[0],
+                    "name": updated_purchase[1],
+                    "description": updated_purchase[2],
+                }
+            ),
+        }
+    except Exception as e:
+        conn.rollback()
+        print("Error in update_purchase:", str(e))
+        return {
+            "statusCode": 500,
+            "body": json.dumps(
+                {"message": "Error updating purchase", "error": str(e)}
+            ),
+        }
+
+
 def lambda_handler(event, context):
     """
     Main Lambda handler for the /purchases/{purchase_id} endpoint.
@@ -116,6 +157,17 @@ def lambda_handler(event, context):
                 ),
             }
         return delete_purchase(purchase_id)
+    elif http_method == "PUT":
+        try:
+            payload = json.loads(event.get("body", "{}"))
+        except Exception as e:
+            return {
+                "statusCode": 400,
+                "body": json.dumps(
+                    {"message": "Invalid JSON", "error": str(e)}
+                ),
+            }
+        return update_purchase(purchase_id, payload)
 
     else:
         return {

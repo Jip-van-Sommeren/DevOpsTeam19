@@ -1,4 +1,3 @@
-import json
 from psycopg2.extras import execute_values
 from db_layer.db_connect import get_connection
 
@@ -15,9 +14,14 @@ def add_purchase(purchase):
         with conn.cursor() as cur:
             # Insert into purchases table
             cur.execute(
-                "INSERT INTO purchases (user_id, payment_token) VALUES \
+                "INSERT INTO purchases (user_id, payment_token, status)\
+                    VALUES \
                     (%s, %s)  RETURNING id, user_id, payment_token;",
-                (purchase["user_id"], purchase["payment_token"]),
+                (
+                    purchase["user_id"],
+                    purchase["payment_token"],
+                    purchase["status"],
+                ),
             )
             new_purchase = cur.fetchone()
             purchase_id = new_purchase[0]
@@ -26,11 +30,17 @@ def add_purchase(purchase):
             inserted_items = []
             if items:
                 values = [
-                    (purchase_id, item["item_id"], item["quantity"])
+                    (
+                        purchase_id,
+                        item["item_id"],
+                        item["location_id"],
+                        item["quantity"],
+                    )
                     for item in items
                 ]
                 sql = """
-                INSERT INTO purchased_items (purchase_id, item_id, quantity)
+                INSERT INTO purchased_items (purchase_id, item_id, location_id,
+                quantity)
                 VALUES %s
                 RETURNING purchase_id, item_id, quantity;
                 """
@@ -49,20 +59,11 @@ def add_purchase(purchase):
             },
             "items": inserted_items,
         }
-        return {
-            "statusCode": 201,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(response_body),
-        }
+        return response_body
     except Exception as e:
         conn.rollback()
         print("Error adding purchase:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps(
-                {"message": "Error adding purchase", "error": str(e)}
-            ),
-        }
+        raise e  # Raise the exception to let Step Functions catch it if needed
 
 
 def lambda_handler(event, context):
@@ -84,9 +85,4 @@ def lambda_handler(event, context):
     except Exception as e:
         conn.rollback()
         print("Error updating purchased_items:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps(
-                {"message": "Error updating purchased_items", "error": str(e)}
-            ),
-        }
+        raise e

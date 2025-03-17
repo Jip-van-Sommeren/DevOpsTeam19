@@ -10,15 +10,6 @@ STATE_MACHINE_ARN = os.environ.get("STATE_MACHINE_ARN")
 def lambda_handler(event, context):
     # Extract data from the API request (e.g., body)
     http_method = event.get("httpMethod", "")
-    path_params = event.get("pathParameters") or {}
-    purchase_id = path_params.get("purchase_id")
-
-    if not purchase_id:
-        return {
-            "statusCode": 400,
-            "body": json.dumps({"message": "Missing item_id in path"}),
-        }
-
     if http_method == "PUT":
         try:
             body = json.loads(event.get("body", "{}"))
@@ -32,7 +23,7 @@ def lambda_handler(event, context):
                     }
                 ),
             }
-        body["stock_operation"] = "add"
+        body["stock_operation"] = "deduct"
         state_machine_input = json.dumps({"data": body})
 
         # Start the execution of the state machine

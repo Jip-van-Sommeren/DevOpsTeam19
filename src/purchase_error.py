@@ -44,7 +44,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": json.dumps(
-                {"message": f"Purchase {purchase_id} canceled successfully."}
+                {"message": f"Purchase {purchase_id} cancelled successfully."}
             ),
         }
 
