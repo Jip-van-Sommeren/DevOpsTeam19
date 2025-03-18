@@ -178,7 +178,11 @@ def lambda_handler(event, context):
 
         response_data = update_reservation_items(user_id, items)
         # Return the response_data directly.
-        return response_data
+        return {
+            "response_body": response_data,
+            "reservation_id": response_data["reservation"]["id"],
+            "response_code": 200,
+        }
 
     except Exception as e:
         print("Error updating reservation items:", str(e))
