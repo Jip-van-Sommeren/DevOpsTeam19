@@ -719,3 +719,37 @@ jobs:
             --handler items_post.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update items_post
+
+      ###################################################
+      # Package & Deploy checkPostExecution Lambda   #
+      ###################################################
+      - name: Package checkPostExecution function
+        run: |
+          cd src
+          zip -r checkPostExecution.zip check_post_execution.py
+          cd ..
+      - name: Deploy checkPostExecution Lambda Function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          aws lambda update-function-code \
+            --function-name checkPostExecution \
+            --zip-file fileb://src/checkPostExecution.zip
+          check_update checkPostExecution
+      - name: Update checkPostExecution Function Configuration (set handler)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          source scripts/check_update.sh
+          LATEST_LAYER=$(aws lambda list-layer-versions --layer-name db_layer --query 'LayerVersions[0].LayerVersionArn' --output text)
+          echo "Using latest layer ARN: $LATEST_LAYER"
+          aws lambda update-function-configuration \
+            --function-name checkPostExecution \
+            --handler check_post_execution.lambda_handler \
+            --layers "$LATEST_LAYER"
+          check_update checkPostExecution

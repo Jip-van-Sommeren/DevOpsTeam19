@@ -72,18 +72,16 @@ def lambda_handler(event, context):
 
     try:
         # Expect the request body to contain JSON data for the new item.
-        items = json.loads(event.get("data", "{}").get("items"))
+        items = event.get("data", "{}").get("items")
         if not isinstance(items, list):
             return {
                 "statusCode": 400,
-                "body": json.dumps(
-                    {
-                        "message": "Invalid JSON in request body",
-                        "error": "Expected 'items' to be a list",
-                    }
-                ),
+                "body": {
+                    "message": "Invalid JSON in request body",
+                    "error": "Expected 'items' to be a list",
+                },
             }
         added_items = add_items(items)
-        return {"added_items": added_items, "response_code": 201}
+        return {"added_items": added_items, "statusCode": 201}
     except Exception as e:
         raise e
