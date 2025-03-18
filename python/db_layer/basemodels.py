@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from datetime import datetime
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -89,6 +90,13 @@ class Reservation(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
 
+    # This relationship references the ReservedItem model
+    reserved_items = relationship(
+        "ReservedItem",
+        back_populates="reservation",
+        cascade="all, delete-orphan",
+    )
+
 
 """
 CREATE TABLE purchases (
@@ -112,6 +120,12 @@ class Purchase(Base):
     purchase_date = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
 
+    purchased_items = relationship(
+        "PurchasedItem",
+        back_populates="purchase",
+        cascade="all, delete-orphan",
+    )
+
 
 """
 CREATE TABLE reserved_items (
@@ -133,6 +147,9 @@ class ReservedItem(Base):
     quantity = Column(Integer, nullable=False)
     location_id = Column(Integer, nullable=False)
 
+    # The relationship back to Reservation
+    reservation = relationship("Reservation", back_populates="reserved_items")
+
 
 """
 CREATE TABLE purchased_items (
@@ -151,3 +168,4 @@ class PurchasedItem(Base):
     item_id = Column(Integer, primary_key=True)
     quantity = Column(Integer, nullable=False)
     location_id = Column(Integer, nullable=False)
+    purchase = relationship("Purchase", back_populates="purchased_items")

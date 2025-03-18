@@ -130,9 +130,9 @@ def add_purchase(purchase):
             for pi in purchased_items_objects:
                 inserted_items.append(
                     {
-                        "purchase_id": pi.purchase_id,
                         "item_id": pi.item_id,
                         "quantity": pi.quantity,
+                        "location_id": pi.location_id,
                     }
                 )
 
@@ -165,9 +165,19 @@ def lambda_handler(event, context):
     print("Received event:", event)
     try:
         purchase_data = event.get("data")
+
         # Insert the purchase and associated purchased items.
         response_body = add_purchase(purchase_data)
-        return {"response": response_body, "statusCode": 201}
+        reservation_id = purchase_data.get("reservation_id")
+        if reservation_id:
+            # Update the reservation status to 'completed'.
+            return {
+                "response_body": response_body,
+                "statusCode": 201,
+                "reservation_id": reservation_id,
+            }
+        else:
+            return {"response_body": response_body, "statusCode": 201}
     except Exception as e:
         print("Error updating purchased_items:", str(e))
         raise e
