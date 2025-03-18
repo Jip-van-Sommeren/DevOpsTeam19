@@ -171,67 +171,6 @@ def get_items(event):
         session.close()
 
 
-def add_items(items):
-    """
-    Inserts multiple new items into the database.
-    Expects `items` to be a list of dicts, each with at least 'name' and 'price'.
-    Optionally, each item can include a 'description' key and a base64-encoded 'image_data'.
-    If image_data is provided, the image is uploaded to S3 and its key is added to the response.
-    """
-    session = get_session()
-    added_items = []
-
-    try:
-        for item in items:
-            new_item = Item(
-                name=item["name"],
-                description=item.get("description", ""),
-                price=item["price"],
-            )
-            session.add(new_item)
-            session.commit()
-            session.refresh(new_item)
-
-            s3_key = None
-            if "image_data" in item:
-                image_data = base64.b64decode(item["image_data"])
-                s3_key = f"items/{new_item.id}_{uuid.uuid4().hex}.jpg"
-                s3_client.put_object(
-                    Bucket=S3_BUCKET,
-                    Key=s3_key,
-                    Body=image_data,
-                    ContentType="image/jpeg",
-                )
-
-            response_item = {
-                "id": new_item.id,
-                "name": new_item.name,
-                "description": new_item.description,
-                "price": new_item.price,
-            }
-            if s3_key:
-                response_item["s3_key"] = s3_key
-
-            added_items.append(response_item)
-
-        return {
-            "statusCode": 201,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(added_items),
-        }
-    except Exception as e:
-        session.rollback()
-        print("Error adding items:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps(
-                {"message": "Error adding items", "error": str(e)}
-            ),
-        }
-    finally:
-        session.close()
-
-
 def lambda_handler(event, context):
     """
     Main Lambda handler. Routes requests based on HTTP method.
@@ -246,21 +185,6 @@ def lambda_handler(event, context):
             return get_items(
                 event
             )  # Assumes you have a get_items function that accepts event
-        elif http_method == "POST":
-            try:
-                # Expect the request body to contain JSON data for the new item.
-                items = json.loads(event.get("body", "{}"))
-            except Exception as e:
-                return {
-                    "statusCode": 400,
-                    "body": json.dumps(
-                        {
-                            "message": "Invalid JSON in request body",
-                            "error": str(e),
-                        }
-                    ),
-                }
-            return add_items(items)
 
     # If the request doesn't match any endpoint, return 404.
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}
