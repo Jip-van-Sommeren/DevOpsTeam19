@@ -175,9 +175,14 @@ def lambda_handler(event, context):
                 "response_body": response_body,
                 "statusCode": 201,
                 "reservation_id": reservation_id,
+                "purchase_id": response_body["purchase"]["id"],
             }
         else:
-            return {"response_body": response_body, "statusCode": 201}
+            return {
+                "response_body": response_body,
+                "statusCode": 201,
+                "purchase_id": response_body["purchase"]["id"],
+            }
     except Exception as e:
         print("Error updating purchased_items:", str(e))
         raise e

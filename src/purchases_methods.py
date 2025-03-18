@@ -105,14 +105,14 @@ def get_purchases(event):
             )
 
         purchases_list = []
-        for res in purchases:
+        for purchase in purchases:
             purchases_list.append(
                 {
-                    "id": res.id,
-                    "user_id": res.user_id,
+                    "id": purchase.id,
+                    "user_id": purchase.user_id,
                     "items": [
                         {"item_id": item.item_id, "quantity": item.quantity}
-                        for item in res.reserved_items
+                        for item in purchase.purchased_items
                     ],
                 }
             )

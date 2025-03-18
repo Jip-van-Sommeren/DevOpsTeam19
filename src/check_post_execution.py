@@ -20,9 +20,7 @@ def lambda_handler(event, context):
 
         status = response["status"]
         output = response["output"]
-        status_code = (
-            json.loads(output["data"]).get("statusCode") if output else None
-        )
+        status_code = json.loads(output).get("statusCode") if output else None
 
         if status == "RUNNING":
             return {

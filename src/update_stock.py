@@ -1,4 +1,3 @@
-import json
 import os
 import boto3
 
@@ -173,7 +172,7 @@ def send_stock_alert(item_id, stock):
     message = (
         f"Alert: Stock for item {item_id} is low. Current stock: {stock}."
     )
-    # Assuming sns_client and SNS_TOPIC_ARN are defined/imported elsewhere in your code.
+
     response = sns_client.publish(
         TopicArn=SNS_TOPIC_ARN, Message=message, Subject="Low Stock Alert"
     )
@@ -182,10 +181,12 @@ def send_stock_alert(item_id, stock):
 
 def lambda_handler(event, context):
     """
-    Lambda handler to update inventory based on data passed from the state machine.
+    Lambda handler to update inventory based on data passed from the state
+    machine.
     Expects the event to contain:
       - a nested "data" key with an "items" array,
-      - and an "operation" field indicating the update type ("deduct" for purchases, "add" for cancellations, "reset" to set a new quantity).
+      - and an "operation" field indicating the update type ("deduct" for
+      purchases, "add" for cancellations, "reset" to set a new quantity).
     """
     print("Received event:", event)
     session = get_session()
@@ -225,7 +226,32 @@ def lambda_handler(event, context):
                     send_stock_alert(updated["id"], updated["quantity"])
 
         print("Stock updated for items:", updated_items)
-        return {"updated_items": updated_items, "statusCode": 201}
+        reservation_id = data.get("reservation_id")
+        purchase_id = data.get("purchase_id")
+        if reservation_id and purchase_id:
+            return {
+                "updated_items": updated_items,
+                "statusCode": 201,
+                "reservation_id": reservation_id,
+                "purchase_id": purchase_id,
+            }
+        elif reservation_id:
+            return {
+                "updated_items": updated_items,
+                "statusCode": 201,
+                "reservation_id": reservation_id,
+            }
+        elif purchase_id:
+            return {
+                "updated_items": updated_items,
+                "statusCode": 201,
+                "purchase_id": purchase_id,
+            }
+        else:
+            return {
+                "updated_items": updated_items,
+                "statusCode": 201,
+            }
 
     except Exception as e:
         session.rollback()
