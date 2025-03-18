@@ -376,7 +376,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name invokeReservationStep \
-            --handler invokeReservationStep.lambda_handler \
+            --handler invoke_reservation_step.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update invokeReservationStep
 
@@ -410,7 +410,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name invokePurchaseStep \
-            --handler invokePurchaseStep.lambda_handler \
+            --handler invoke_purchase_step.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update invokePurchaseStep
 
@@ -512,7 +512,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name updateStockLambda \
-            --handler updateStockLambda.lambda_handler \
+            --handler update_stock.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update updateStockLambda
 
@@ -546,7 +546,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name purchaseError \
-            --handler purchaseError.lambda_handler \
+            --handler purchase_error.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update purchaseError
 
@@ -580,7 +580,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name deleteReservation \
-            --handler deleteReservation.lambda_handler \
+            --handler reservation_error.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update deleteReservation
 
@@ -648,7 +648,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name stock_items_id_method \
-            --handler stock_items_id_method.lambda_handler \
+            --handler stock_item_id_methods.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update stock_items_id_method
 
@@ -682,7 +682,7 @@ jobs:
           echo "Using latest layer ARN: $LATEST_LAYER"
           aws lambda update-function-configuration \
             --function-name invokeItemsStep \
-            --handler invokeItemsStep.lambda_handler \
+            --handler invoke_item_step.lambda_handler \
             --layers "$LATEST_LAYER"
           check_update invokeItemsStep
 
