@@ -43,9 +43,7 @@ def lambda_handler(event, context):
     # Expecting a 'reservationId' in the event payload
     data = event.get("data") or {}
     # Navigate the nested structure to get the reservation id.
-    reservation_id = (
-        data.get("response_body", {}).get("reservation", {}).get("id")
-    )
+    reservation_id = data.get("reservation_id")
 
     if not reservation_id:
         raise ValueError("Missing reservation_id in event data")

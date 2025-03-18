@@ -10,7 +10,8 @@ STATE_MACHINE_ARN = os.environ.get("STATE_MACHINE_ARN")
 def lambda_handler(event, context):
     # Extract data from the API request (e.g., body)
     http_method = event.get("httpMethod", "")
-    if http_method == "PUT":
+    resource = event.get("resource", "")
+    if resource == "/reservations" and http_method == "POST":
         try:
             body = json.loads(event.get("body", "{}"))
         except Exception as e:

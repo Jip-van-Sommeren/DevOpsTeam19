@@ -193,7 +193,7 @@ def lambda_handler(event, context):
     try:
         # Extract and validate input
         data = event.get("data", {})
-        items = data.get("items")
+        items = data.get("response_body", {}).get("items")
         operation = data.get(
             "operation", "deduct"
         )  # default to 'deduct' if not specified
@@ -225,21 +225,10 @@ def lambda_handler(event, context):
                     send_stock_alert(updated["id"], updated["quantity"])
 
         print("Stock updated for items:", updated_items)
-        return {
-            "statusCode": 200,
-            "body": json.dumps(
-                {"message": "Stock updated", "updated": updated_items}
-            ),
-        }
+        return {"updated_items": updated_items, "response_code": 200}
 
     except Exception as e:
         session.rollback()
-        print("Error updating stock:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps(
-                {"message": "Error updating stock", "error": str(e)}
-            ),
-        }
+        raise e
     finally:
         session.close()

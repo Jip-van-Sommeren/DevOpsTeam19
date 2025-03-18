@@ -173,6 +173,7 @@
 #             ),
 #         }
 import json
+from sqlalchemy.orm import joinedload
 from db_layer.db_connect import get_session
 from db_layer.basemodels import Purchase, PurchasedItem
 
@@ -180,23 +181,33 @@ from db_layer.basemodels import Purchase, PurchasedItem
 def get_purchase(purchase_id):
     session = get_session()
     try:
+        # Fetch purchase along with associated purchased items
         purchase = (
-            session.query(Purchase).filter(Purchase.id == purchase_id).first()
+            session.query(Purchase)
+            .options(joinedload(Purchase.purchased_items))
+            .filter(Purchase.id == purchase_id)
+            .first()
         )
+
         if not purchase:
             return {
                 "statusCode": 404,
                 "body": json.dumps({"message": "Purchase not found"}),
             }
-        # Map fields: using 'name' for user_id and 'description' for payment_token (to mimic your original structure)
+
+        # Build response object including purchased items
         purchase_data = {
             "id": purchase.id,
-            "name": purchase.user_id,
-            "description": purchase.payment_token,
-            "status": purchase.status,
-            "purchase_date": (
-                purchase.purchase_date.isoformat()
-                if purchase.purchase_date
+            "user_id": purchase.user_id,
+            "payment_token": purchase.payment_token,
+            "purchase_items": [
+                {"item_id": item.item_id, "quantity": item.quantity}
+                for item in purchase.purchased_items
+            ],
+            "status": getattr(purchase, "status", None),
+            "created_at": (
+                purchase.created_at.isoformat()
+                if purchase.created_at
                 else None
             ),
             "updated_at": (
@@ -205,17 +216,18 @@ def get_purchase(purchase_id):
                 else None
             ),
         }
+
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
             "body": json.dumps(purchase_data),
         }
     except Exception as e:
-        print("Error in get_purchase:", str(e))
+        print("Error fetching purchase:", str(e))
         return {
             "statusCode": 500,
             "body": json.dumps(
-                {"message": "Error retrieving purchase", "error": str(e)}
+                {"message": "Error fetching purchase", "error": str(e)}
             ),
         }
     finally:

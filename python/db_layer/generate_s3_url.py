@@ -23,10 +23,3 @@ def generate_presigned_url(bucket_name, object_key, expiration=3600):
     except Exception as e:
         print("Error generating pre-signed URL:", str(e))
         return None
-
-
-# Example usage:
-bucket = "your-bucket-name"
-key = "path/to/your/image.jpg"
-url = generate_presigned_url(bucket, key, expiration=3600)
-print("Pre-signed URL:", url)

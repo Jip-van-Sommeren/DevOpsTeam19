@@ -64,11 +64,13 @@
 import json
 from db_layer.db_connect import get_session
 from db_layer.basemodels import Reservation
+from sqlalchemy.orm import joinedload
 
 
 def get_reservations(event):
     """
-    Retrieves a list of reservations from the database with pagination.
+    Retrieves a list of reservations from the database with pagination,
+    including reserved items.
     Expects query string parameters "skip" and "limit" for pagination.
     Defaults: skip=0, limit=100.
     """
@@ -83,23 +85,35 @@ def get_reservations(event):
             limit = 100
         if limit > 1000:
             limit = 1000
+        user_id = query_params.get("user_id")
+        if user_id:
+            reservations = (
+                session.query(Reservation)
+                .options(joinedload(Reservation.reserved_items))
+                .filter(Reservation.user_id == user_id)
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
+        else:
+            reservations = (
+                session.query(Reservation)
+                .options(joinedload(Reservation.reserved_items))
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
 
-        reservations = (
-            session.query(Reservation).offset(skip).limit(limit).all()
-        )
         reservations_list = []
         for res in reservations:
             reservations_list.append(
                 {
                     "id": res.id,
                     "user_id": res.user_id,
-                    "status": res.status,
-                    "created_at": (
-                        res.created_at.isoformat() if res.created_at else None
-                    ),
-                    "updated_at": (
-                        res.updated_at.isoformat() if res.updated_at else None
-                    ),
+                    "items": [
+                        {"item_id": item.item_id, "quantity": item.quantity}
+                        for item in res.reserved_items
+                    ],
                 }
             )
 
