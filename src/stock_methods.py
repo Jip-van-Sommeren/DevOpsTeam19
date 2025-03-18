@@ -251,8 +251,8 @@ def lambda_handler(event, context):
         elif http_method == "POST":
             # Expect the request body to contain JSON data.
             try:
-                body = event.get("body", "")
-                items = json.loads(body)
+                body = json.loads(event.get("body", "{}"))
+                items = body.get("items", [])
                 # Ensure we have a list of items.
                 if not isinstance(items, list):
                     items = [items]

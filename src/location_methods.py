@@ -144,7 +144,7 @@ from db_layer.db_connect import get_session
 from db_layer.basemodels import Location
 
 
-def get_location(event):
+def get_locations(event):
     """
     Retrieves a list of locations from the database with pagination.
     Expects query string parameters "skip" and "limit" for pagination.
@@ -265,9 +265,9 @@ def lambda_handler(event, context):
     resource = event.get("resource", "")
 
     # Route for /location endpoint
-    if resource == "/location":
+    if resource == "/locations":
         if http_method == "GET":
-            return get_location(event)
+            return get_locations(event)
         elif http_method == "POST":
             try:
                 location = json.loads(event.get("body", "{}"))

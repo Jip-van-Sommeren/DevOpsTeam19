@@ -171,63 +171,61 @@ def get_items(event):
         session.close()
 
 
-def add_item(item):
+def add_items(items):
     """
-    Inserts a new item into the database.
-    Expects `item` to be a dict with at least 'name' and 'price'.
-    Optionally, it can include a 'description' key and a base64-encoded 'image_data'.
-    If image_data is provided, the image is uploaded to S3 and its URL is added to the response.
+    Inserts multiple new items into the database.
+    Expects `items` to be a list of dicts, each with at least 'name' and 'price'.
+    Optionally, each item can include a 'description' key and a base64-encoded 'image_data'.
+    If image_data is provided, the image is uploaded to S3 and its key is added to the response.
     """
     session = get_session()
+    added_items = []
+
     try:
-        # Create the new item record (adjust attributes as needed)
-        new_item = Item(
-            name=item["name"],
-            description=item.get("description", ""),
-            price=item["price"],
-        )
-        session.add(new_item)
-        session.commit()
-        session.refresh(new_item)  # Retrieve generated id and defaults
-
-        # Check if image data is provided in the payload.
-        if "image_data" in item:
-            # Decode the base64 image data.
-            image_data = base64.b64decode(item["image_data"])
-            # Generate a unique key for the image file in S3.
-            s3_key = f"items/{new_item.id}_{uuid.uuid4().hex}.jpg"
-            # Upload the image to S3.
-            s3_client.put_object(
-                Bucket=S3_BUCKET,
-                Key=s3_key,
-                Body=image_data,
-                ContentType="image/jpeg",
+        for item in items:
+            new_item = Item(
+                name=item["name"],
+                description=item.get("description", ""),
+                price=item["price"],
             )
-            # Build a public URL for the uploaded image.
-            # image_url = f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}"
+            session.add(new_item)
+            session.commit()
+            session.refresh(new_item)
 
-        # Build response item.
-        response_item = {
-            "id": new_item.id,
-            "name": new_item.name,
-            "description": new_item.description,
-            "price": new_item.price,
-        }
-        if s3_key:
-            response_item["s3_key"] = s3_key
+            s3_key = None
+            if "image_data" in item:
+                image_data = base64.b64decode(item["image_data"])
+                s3_key = f"items/{new_item.id}_{uuid.uuid4().hex}.jpg"
+                s3_client.put_object(
+                    Bucket=S3_BUCKET,
+                    Key=s3_key,
+                    Body=image_data,
+                    ContentType="image/jpeg",
+                )
+
+            response_item = {
+                "id": new_item.id,
+                "name": new_item.name,
+                "description": new_item.description,
+                "price": new_item.price,
+            }
+            if s3_key:
+                response_item["s3_key"] = s3_key
+
+            added_items.append(response_item)
 
         return {
             "statusCode": 201,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps(response_item),
+            "body": json.dumps(added_items),
         }
     except Exception as e:
         session.rollback()
-        print("Error adding item:", str(e))
+        print("Error adding items:", str(e))
         return {
             "statusCode": 500,
             "body": json.dumps(
-                {"message": "Error adding item", "error": str(e)}
+                {"message": "Error adding items", "error": str(e)}
             ),
         }
     finally:
@@ -251,7 +249,7 @@ def lambda_handler(event, context):
         elif http_method == "POST":
             try:
                 # Expect the request body to contain JSON data for the new item.
-                item = json.loads(event.get("body", "{}"))
+                items = json.loads(event.get("body", "{}"))
             except Exception as e:
                 return {
                     "statusCode": 400,
@@ -262,7 +260,7 @@ def lambda_handler(event, context):
                         }
                     ),
                 }
-            return add_item(item)
+            return add_items(items)
 
     # If the request doesn't match any endpoint, return 404.
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}
