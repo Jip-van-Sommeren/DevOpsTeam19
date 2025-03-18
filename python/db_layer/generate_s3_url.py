@@ -12,7 +12,7 @@ def generate_presigned_url(bucket_name, object_key, expiration=3600):
     """
     if object_key is None:
         return None
-    s3_client = boto3.client("s3")
+    s3_client = boto3.client("s3", region_name="eu-north-1")
     try:
         response = s3_client.generate_presigned_url(
             "get_object",

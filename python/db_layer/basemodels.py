@@ -131,6 +131,7 @@ class ReservedItem(Base):
     )
     item_id = Column(Integer, primary_key=True)
     quantity = Column(Integer, nullable=False)
+    location_id = Column(Integer, nullable=False)
 
 
 """
@@ -149,3 +150,4 @@ class PurchasedItem(Base):
     purchase_id = Column(Integer, ForeignKey("purchases.id"), primary_key=True)
     item_id = Column(Integer, primary_key=True)
     quantity = Column(Integer, nullable=False)
+    location_id = Column(Integer, nullable=False)

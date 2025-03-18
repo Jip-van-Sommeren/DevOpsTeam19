@@ -58,7 +58,6 @@
 #             ),
 #         }
 
-import json
 from db_layer.db_connect import get_session
 from db_layer.basemodels import Purchase, PurchasedItem
 
@@ -99,22 +98,16 @@ def lambda_handler(event, context):
         if not purchase_id:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"message": "No purchase_id provided"}),
+                "body": {"message": "No purchase_id provided"},
             }
 
         cancel_purchase(purchase_id)
 
         return {
             "statusCode": 200,
-            "body": json.dumps(
-                {"message": f"Purchase {purchase_id} cancelled successfully."}
-            ),
+            "body": {
+                "message": f"Purchase {purchase_id} cancelled successfully."
+            },
         }
     except Exception as e:
-        print("Error canceling purchase:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps(
-                {"message": "Error canceling purchase", "error": str(e)}
-            ),
-        }
+        raise e

@@ -19,9 +19,9 @@ def lambda_handler(event, context):
         response = sfn_client.describe_execution(executionArn=execution_arn)
 
         status = response["status"]
-        output = response.get("output")
+        output = response["output"]
         status_code = (
-            output.get("data", {}).get("statusCode") if output else None
+            json.loads(output["data"]).get("statusCode") if output else None
         )
 
         if status == "RUNNING":
@@ -45,7 +45,7 @@ def lambda_handler(event, context):
             return {
                 "statusCode": status_code or 400,
                 "body": json.dumps(
-                    {"status": "FAILED", "result": json.loads(output)}
+                    {"status": "FAILED", "result": json.loads(output or {})}
                 ),
             }
         else:
@@ -67,3 +67,6 @@ def lambda_handler(event, context):
                 {"message": "Error checking execution", "error": str(e)}
             ),
         }
+
+
+# arn:aws:states:eu-north-1:904233098419:execution:itemsStateMachine:ac90865e-8bc0-4b9c-a6e1-c2363ebcf816

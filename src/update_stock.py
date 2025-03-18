@@ -225,7 +225,7 @@ def lambda_handler(event, context):
                     send_stock_alert(updated["id"], updated["quantity"])
 
         print("Stock updated for items:", updated_items)
-        return {"updated_items": updated_items, "response_code": 200}
+        return {"updated_items": updated_items, "statusCode": 201}
 
     except Exception as e:
         session.rollback()

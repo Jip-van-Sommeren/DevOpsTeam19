@@ -167,7 +167,7 @@ def lambda_handler(event, context):
         purchase_data = event.get("data")
         # Insert the purchase and associated purchased items.
         response_body = add_purchase(purchase_data)
-        return {"response": response_body, "response_code": 201}
+        return {"response": response_body, "statusCode": 201}
     except Exception as e:
         print("Error updating purchased_items:", str(e))
         raise e

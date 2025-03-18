@@ -185,6 +185,8 @@ def lambda_handler(event, context):
             return get_items(
                 event
             )  # Assumes you have a get_items function that accepts event
+        http_method = event.get("httpMethod", "")
+    resource = event.get("resource", "")
 
     # If the request doesn't match any endpoint, return 404.
     return {"statusCode": 404, "body": json.dumps({"message": "Not Found"})}

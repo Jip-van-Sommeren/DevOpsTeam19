@@ -209,8 +209,14 @@ def get_location(location_id):
             # Mimic the original response mapping:
             response_body = {
                 "id": location.id,
-                "name": location.address,  # using address as "name"
-                "description": location.zip_code,  # using zip_code as "description"
+                "address": location.address,
+                "zip_code": location.zip_code,
+                "city": location.city,
+                "street": location.street,
+                "state": location.state,
+                "number": location.number,
+                "addition": location.addition,
+                "type": location.type,
             }
             return {
                 "statusCode": 200,
@@ -251,11 +257,7 @@ def delete_location(location_id):
                 "body": json.dumps({"message": "location not found"}),
             }
         # Prepare response data before deletion.
-        response_body = {
-            "id": location.id,
-            "name": location.address,
-            "description": location.zip_code,
-        }
+        response_body = {"id": location.id}
         # Delete the record and commit.
         session.delete(location)
         session.commit()

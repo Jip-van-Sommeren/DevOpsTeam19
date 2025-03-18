@@ -181,7 +181,7 @@ def lambda_handler(event, context):
         return {
             "response_body": response_data,
             "reservation_id": response_data["reservation"]["id"],
-            "response_code": 200,
+            "statusCode": 201,
         }
 
     except Exception as e:

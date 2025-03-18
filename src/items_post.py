@@ -9,7 +9,7 @@ from db_layer.basemodels import (
 )  # Assuming you have an ORM model named Item
 
 # Initialize S3 client and get the bucket name from environment variables
-s3_client = boto3.client("s3")
+s3_client = boto3.client("s3", region_name="eu-north-1")
 S3_BUCKET = os.environ.get("S3_BUCKET")
 
 
@@ -25,25 +25,33 @@ def add_items(items):
 
     try:
         for item in items:
-            new_item = Item(
-                name=item["name"],
-                description=item.get("description", ""),
-                price=item["price"],
-            )
-            session.add(new_item)
-            session.commit()
-            session.refresh(new_item)
 
             s3_key = None
             if "image_data" in item:
                 image_data = base64.b64decode(item["image_data"])
-                s3_key = f"items/{new_item.id}_{uuid.uuid4().hex}.jpg"
+                s3_key = f"items/item_{uuid.uuid4().hex}.jpg"
                 s3_client.put_object(
                     Bucket=S3_BUCKET,
                     Key=s3_key,
                     Body=image_data,
                     ContentType="image/jpeg",
                 )
+            if s3_key:
+                new_item = Item(
+                    name=item["name"],
+                    description=item["description"],
+                    price=item["price"],
+                    s3_key=s3_key,
+                )
+            else:
+                new_item = Item(
+                    name=item["name"],
+                    description=["description"],
+                    price=item["price"],
+                )
+            session.add(new_item)
+            session.commit()
+            session.refresh(new_item)
 
             response_item = {
                 "id": new_item.id,
