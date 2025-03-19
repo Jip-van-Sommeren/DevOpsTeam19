@@ -1,4 +1,3 @@
-import json
 import os
 import boto3
 import base64
@@ -6,7 +5,7 @@ import uuid
 from db_layer.db_connect import get_session
 from db_layer.basemodels import (
     Item,
-)  # Assuming you have an ORM model named Item
+)
 
 # Initialize S3 client and get the bucket name from environment variables
 s3_client = boto3.client("s3", region_name="eu-north-1")
@@ -16,9 +15,12 @@ S3_BUCKET = os.environ.get("S3_BUCKET")
 def add_items(items):
     """
     Inserts multiple new items into the database.
-    Expects `items` to be a list of dicts, each with at least 'name' and 'price'.
-    Optionally, each item can include a 'description' key and a base64-encoded 'image_data'.
-    If image_data is provided, the image is uploaded to S3 and its key is added to the response.
+    Expects `items` to be a list of dicts, each with at least 'name' and
+    'price'.
+    Optionally, each item can include a 'description' key and a
+    base64-encoded 'image_data'.
+    If image_data is provided, the image is uploaded to S3 and its key
+    is added to the response.
     """
     session = get_session()
     added_items = []

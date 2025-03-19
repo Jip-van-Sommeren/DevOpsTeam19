@@ -65,6 +65,3 @@ def lambda_handler(event, context):
                 {"message": "Error checking execution", "error": str(e)}
             ),
         }
-
-
-# arn:aws:states:eu-north-1:904233098419:execution:itemsStateMachine:ac90865e-8bc0-4b9c-a6e1-c2363ebcf816
