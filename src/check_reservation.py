@@ -22,7 +22,7 @@ def lambda_handler(event, context):
             return {
                 "stock_operation": "add",
                 "reservationExists": True,
-                "items": data.get("items"),
+                "items": data.get("response_body", {}).get("items"),
             }
         else:
             return {"reservationExists": False}

@@ -43,25 +43,20 @@ def lambda_handler(event, context):
         if not reservation_id:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"message": "No reservation_id provided"}),
+                "body": {"message": "No reservation_id provided"},
+                "data": event.get("data"),
             }
 
         cancel_reservation(reservation_id)
 
         return {
             "statusCode": 200,
-            "body": json.dumps(
-                {
-                    "message": f"Reservation {reservation_id} \
+            "body": {
+                "message": f"Reservation {reservation_id} \
                         canceled successfully."
-                }
-            ),
+            },
+            "data": event.get("data"),
         }
     except Exception as e:
         print("Error canceling reservation:", str(e))
-        return {
-            "statusCode": 500,
-            "body": json.dumps(
-                {"message": "Error canceling reservation", "error": str(e)}
-            ),
-        }
+        raise e

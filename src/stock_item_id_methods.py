@@ -138,35 +138,31 @@ def update_stock(item, operation):
 
 def lambda_handler(event, context):
     """
-    Main Lambda handler for the /items/{item_id} endpoint.
+    Main Lambda handler for the /stock/{id} endpoint.
     Routes requests based on HTTP method.
     """
     http_method = event.get("httpMethod", "")
     path_params = event.get("pathParameters") or {}
     item_id = path_params.get("item_id")
-    query_params = event.get("queryStringParameters", {})
-    location_id = query_params.get("location_id")
 
     if not item_id:
         return {
             "statusCode": 400,
             "body": json.dumps({"message": "Missing item_id in path"}),
         }
-
+    try:
+        payload = json.loads(event.get("body", "{}"))
+    except Exception as e:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({"message": "Invalid JSON", "error": str(e)}),
+        }
     if http_method == "GET":
-        return get_item(item_id, location_id)
+        return get_item(item_id, payload.get("location_id"))
     elif http_method == "DELETE":
-        return delete_item(item_id, location_id)
+        return delete_item(item_id, payload.get("location_id"))
     elif http_method == "PUT":
-        try:
-            payload = json.loads(event.get("body", "{}"))
-        except Exception as e:
-            return {
-                "statusCode": 400,
-                "body": json.dumps(
-                    {"message": "Invalid JSON", "error": str(e)}
-                ),
-            }
+
         # Default to "overwrite" which we treat as "reset"
         stock_operation = payload.get("stock_operation", "reset")
         try:

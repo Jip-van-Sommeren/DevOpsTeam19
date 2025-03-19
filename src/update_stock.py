@@ -6,7 +6,7 @@ from db_layer.basemodels import ItemStock
 # Establish a database connection (ensure this connects to your inventory DB)
 
 # Initialize SNS client
-sns_client = boto3.client("sns")
+sns_client = boto3.client("sns", region_name="eu-north-1")
 SNS_TOPIC_ARN = os.environ.get("STOCK_ALERT_TOPIC_ARN")
 
 

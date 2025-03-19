@@ -97,6 +97,7 @@ def lambda_handler(event, context):
                 "response_body": response_body,
                 "statusCode": 201,
                 "purchase_id": response_body["purchase"]["id"],
+                "stock_operation": "deduct",
             }
     except Exception as e:
         print("Error updating purchased_items:", str(e))
