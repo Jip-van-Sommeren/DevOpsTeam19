@@ -19,7 +19,11 @@ def lambda_handler(event, context):
         )
 
         if reservation:
-            return {"stock_operation": "add", "reservationExists": True}
+            return {
+                "stock_operation": "add",
+                "reservationExists": True,
+                "items": data.get("items"),
+            }
         else:
             return {"reservationExists": False}
     except Exception as e:

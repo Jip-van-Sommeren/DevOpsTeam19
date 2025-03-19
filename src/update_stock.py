@@ -114,6 +114,7 @@ def lambda_handler(event, context):
         purchase_id = data.get("purchase_id")
         if reservation_id and purchase_id:
             return {
+                "response_body": data.get("response_body"),
                 "updated_items": updated_items,
                 "statusCode": 201,
                 "reservation_id": reservation_id,
@@ -121,18 +122,21 @@ def lambda_handler(event, context):
             }
         elif reservation_id:
             return {
+                "response_body": data.get("response_body"),
                 "updated_items": updated_items,
                 "statusCode": 201,
                 "reservation_id": reservation_id,
             }
         elif purchase_id:
             return {
+                "response_body": data.get("response_body"),
                 "updated_items": updated_items,
                 "statusCode": 201,
                 "purchase_id": purchase_id,
             }
         else:
             return {
+                "response_body": data.get("response_body"),
                 "updated_items": updated_items,
                 "statusCode": 201,
             }
