@@ -1,11 +1,12 @@
-import sys
 import os
+import sys
 
-# Print sys.path for debugging (optional)
-print("Before adding src, sys.path:", sys.path)
+# Get the absolute path to the repository root.
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+print("Repository root:", repo_root)
 
-# Add the project's src directory to sys.path.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+# Insert the repository root into sys.path if it's not already there.
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
 
-# Print sys.path for debugging (optional)
-print("After adding src, sys.path:", sys.path)
+print("Updated sys.path:", sys.path)
