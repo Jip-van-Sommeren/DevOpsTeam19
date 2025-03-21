@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: ${{ github.workspace }}
+      AWS_DEFAULT_REGION: "eu-north-1"
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
