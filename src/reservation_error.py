@@ -52,8 +52,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": {
-                "message": f"Reservation {reservation_id} \
-                        canceled successfully."
+                "message": f"Reservation {reservation_id} cancelled successfully."
             },
             "data": event.get("data"),
         }

@@ -65,84 +65,152 @@ def send_stock_alert(item_id, stock):
 
 def lambda_handler(event, context):
     """
-    Lambda handler to update inventory based on data passed from the state
-    machine.
+    Lambda handler to update inventory based on data from the state machine.
+
     Expects the event to contain:
-      - a nested "data" key with an "items" array,
-      - and an "operation" field indicating the update type ("deduct" for
-      purchases, "add" for cancellations, "reset" to set a new quantity).
+      - A nested "data" key with a "response_body" that includes an "items" array.
+      - An "operation" field indicating the update type:
+          "deduct" for purchases (default),
+          "add" for cancellations,
+          "reset" to set a new quantity.
+      - Optionally, "reservation_id" and/or "purchase_id" keys.
     """
     print("Received event:", event)
     session = get_session()
 
     try:
-        # Extract and validate input
+        # Extract input values.
         data = event.get("data", {})
         items = data.get("response_body", {}).get("items")
-        operation = data.get(
-            "operation", "deduct"
-        )  # default to 'deduct' if not specified
+        operation = data.get("operation", "deduct")
 
+        # Validate input.
         if not items:
             raise ValueError("No items provided in the event input.")
 
         updated_items = []
-
-        # Process each item in the list
+        # Update stock for each item.
         for item in items:
             updated = update_stock_for_item(session, item, operation)
             if updated is None:
                 print(
-                    f"Item with ID {item['item_id']} at location \
-                        {item['location_id']} not found or update failed."
+                    f"Item with ID {item.get('item_id')} at location {item.get('location_id')} not found or update failed."
                 )
             else:
                 updated_items.append(updated)
 
-        # Commit all changes once all updates are done
+        # Commit all updates.
         session.commit()
 
-        # For deduction operations, check for low stock and send alerts if
-        # necessary.
+        # Send alerts for low stock if deducting.
         if operation == "deduct":
             for updated in updated_items:
                 if updated.get("quantity", 0) < 10:
                     send_stock_alert(updated["id"], updated["quantity"])
 
         print("Stock updated for items:", updated_items)
-        reservation_id = data.get("reservation_id")
-        purchase_id = data.get("purchase_id")
-        if reservation_id and purchase_id:
-            return {
-                "response_body": data.get("response_body"),
-                "updated_items": updated_items,
-                "statusCode": 201,
-                "reservation_id": reservation_id,
-                "purchase_id": purchase_id,
-            }
-        elif reservation_id:
-            return {
-                "response_body": data.get("response_body"),
-                "updated_items": updated_items,
-                "statusCode": 201,
-                "reservation_id": reservation_id,
-            }
-        elif purchase_id:
-            return {
-                "response_body": data.get("response_body"),
-                "updated_items": updated_items,
-                "statusCode": 201,
-                "purchase_id": purchase_id,
-            }
-        else:
-            return {
-                "response_body": data.get("response_body"),
-                "updated_items": updated_items,
-                "statusCode": 201,
-            }
+
+        # Build response.
+        response = {
+            "response_body": data.get("response_body"),
+            "updated_items": updated_items,
+            "statusCode": 201,
+        }
+        if "reservation_id" in data:
+            response["reservation_id"] = data["reservation_id"]
+        if "purchase_id" in data:
+            response["purchase_id"] = data["purchase_id"]
+
+        return response
 
     except Exception as e:
         session.rollback()
         raise e
+
     finally:
         session.close()
+
+
+# def lambda_handler(event, context):
+#     """
+#     Lambda handler to update inventory based on data passed from the state
+#     machine.
+#     Expects the event to contain:
+#       - a nested "data" key with an "items" array,
+#       - and an "operation" field indicating the update type ("deduct" for
+#       purchases, "add" for cancellations, "reset" to set a new quantity).
+#     """
+#     print("Received event:", event)
+#     session = get_session()
+
+#     try:
+#         # Extract and validate input
+#         data = event.get("data", {})
+#         items = data.get("response_body", {}).get("items")
+#         operation = data.get(
+#             "operation", "deduct"
+#         )  # default to 'deduct' if not specified
+
+#         if not items:
+#             raise ValueError("No items provided in the event input.")
+
+#         updated_items = []
+
+#         # Process each item in the list
+#         for item in items:
+#             updated = update_stock_for_item(session, item, operation)
+#             if updated is None:
+#                 print(
+#                     f"Item with ID {item['item_id']} at location \
+#                         {item['location_id']} not found or update failed."
+#                 )
+#             else:
+#                 updated_items.append(updated)
+
+#         # Commit all changes once all updates are done
+#         session.commit()
+
+#         # For deduction operations, check for low stock and send alerts if
+#         # necessary.
+#         if operation == "deduct":
+#             for updated in updated_items:
+#                 if updated.get("quantity", 0) < 10:
+#                     send_stock_alert(updated["id"], updated["quantity"])
+
+#         print("Stock updated for items:", updated_items)
+#         reservation_id = data.get("reservation_id")
+#         purchase_id = data.get("purchase_id")
+#         if reservation_id and purchase_id:
+#             return {
+#                 "response_body": data.get("response_body"),
+#                 "updated_items": updated_items,
+#                 "statusCode": 201,
+#                 "reservation_id": reservation_id,
+#                 "purchase_id": purchase_id,
+#             }
+#         elif reservation_id:
+#             return {
+#                 "response_body": data.get("response_body"),
+#                 "updated_items": updated_items,
+#                 "statusCode": 201,
+#                 "reservation_id": reservation_id,
+#             }
+#         elif purchase_id:
+#             return {
+#                 "response_body": data.get("response_body"),
+#                 "updated_items": updated_items,
+#                 "statusCode": 201,
+#                 "purchase_id": purchase_id,
+#             }
+#         else:
+#             return {
+#                 "response_body": data.get("response_body"),
+#                 "updated_items": updated_items,
+#                 "statusCode": 201,
+#             }
+
+#     except Exception as e:
+#         session.rollback()
+#         raise e
+#     finally:
+#         session.close()

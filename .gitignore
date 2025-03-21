@@ -9,4 +9,5 @@ venv
 DB_SCHEMA.txt
 __pycache__/
 /old
-/test
+/misc
+.pytest_cache/
