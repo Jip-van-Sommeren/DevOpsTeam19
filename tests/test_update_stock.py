@@ -1,8 +1,6 @@
-import json
 import pytest
 from unittest.mock import MagicMock, patch
 
-# Import the lambda_handler from your module.
 from src.update_stock import lambda_handler
 
 
@@ -16,9 +14,6 @@ def test_lambda_handler_success_deduct(
     fake_session = MagicMock()
     mock_get_session.return_value = fake_session
 
-    # Simulate update_stock_for_item for two items:
-    # First item: updated to quantity 5 (<10, should trigger alert)
-    # Second item: updated to quantity 15 (no alert)
     updated_item1 = {"id": 1, "quantity": 5}
     updated_item2 = {"id": 2, "quantity": 15}
     mock_update_stock.side_effect = [updated_item1, updated_item2]
@@ -104,7 +99,6 @@ def test_lambda_handler_success_non_deduct(
 
 
 def test_lambda_handler_no_items():
-    # Test that if no items are provided in the event input, a ValueError is raised.
     event = {"data": {"response_body": {}}}  # "items" key missing
     context = {}
     with pytest.raises(ValueError) as excinfo:

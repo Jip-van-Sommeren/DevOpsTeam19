@@ -1,9 +1,6 @@
 import json
-import pytest
 from unittest.mock import MagicMock, patch
-
-# Import the lambda_handler and helper functions from your module.
-from src.stock_methods import lambda_handler, get_items, add_items
+from src.stock_methods import lambda_handler
 
 # ---------------------- Helper Tests for GET ---------------------------
 
@@ -20,7 +17,6 @@ def test_get_items_success(mock_get_session):
     # Create a fake session and simulate the query chain.
     fake_session = MagicMock()
     fake_query = MagicMock()
-    # IMPORTANT: Ensure that filter returns a query object so the chain continues.
     fake_query.filter.return_value = fake_query
     fake_offset = MagicMock()
     fake_limit = MagicMock()
@@ -87,7 +83,6 @@ def test_add_items_success(mock_ItemStock, mock_get_session):
     # Setup a fake session.
     fake_session = MagicMock()
 
-    # Set up session.refresh: simulate that it sets an id on the object if not set.
     def refresh_side_effect(item):
         if not hasattr(item, "id") or item.id is None:
             item.id = 1  # For simplicity, assign 1.
@@ -147,16 +142,12 @@ def test_add_items_success(mock_ItemStock, mock_get_session):
     assert inserted_item2["location_id"] == fake_item2.location_id
     assert inserted_item2["quantity"] == fake_item2.quantity
 
-    # Verify that add_all, commit, refresh, and close were called appropriately.
     fake_session.add_all.assert_called_once()  # Items added in bulk.
     # commit should be called once.
     fake_session.commit.assert_called_once()
     # refresh should be called for each fake item.
     assert fake_session.refresh.call_count == 2
     fake_session.close.assert_called_once()
-
-
-# ---------------------- Test for Invalid JSON and 404 ---------------------------
 
 
 def test_lambda_handler_invalid_json():

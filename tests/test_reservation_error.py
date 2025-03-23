@@ -1,6 +1,4 @@
 from unittest.mock import MagicMock, patch
-
-# Import the lambda_handler from your module.
 from src.reservation_error import lambda_handler
 
 
@@ -13,7 +11,6 @@ def test_lambda_handler_no_reservation_id():
     context = {}
     response = lambda_handler(event, context)
     assert response["statusCode"] == 400
-    # The body is returned as a dict.
     assert response["body"]["message"] == "No reservation_id provided"
 
 
@@ -39,19 +36,15 @@ def test_lambda_handler_cancel_success(mock_get_session):
         fake_reservation
     )
 
-    # Build the event with a valid reservation_id.
     event = {"data": {"reservation_id": 42}}
     context = {}
 
-    # Act: Invoke the lambda handler.
     response = lambda_handler(event, context)
 
-    # Assert: Verify that the cancellation succeeded.
     assert response["statusCode"] == 200
     assert (
         response["body"]["message"] == "Reservation 42 cancelled successfully."
     )
 
-    # Verify that the session methods were called:
     fake_session.commit.assert_called_once()
     fake_session.close.assert_called_once()

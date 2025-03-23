@@ -1,8 +1,4 @@
 from unittest.mock import MagicMock, patch
-
-# We will patch get_session, Purchase, and PurchasedItem from the
-# purchase_post module.
-# Import the lambda_handler from purchase_post.
 from src.purchase_post import lambda_handler
 
 
@@ -84,12 +80,7 @@ def test_lambda_handler_without_reservation_with_items(
     fake_purchase = fake_purchase_instance(101, 2, "def")
     mock_Purchase.return_value = fake_purchase
 
-    # Prepare side_effect for PurchasedItem so that each call
-    # returns a fake object
-    # with attributes matching the input.
-    def purchased_item_side_effect(
-        purchase_id, item_id, location_id, quantity
-    ):
+    def purchased_item_side_effect(_, item_id, location_id, quantity):
         fake_pi = MagicMock()
         fake_pi.item_id = item_id
         fake_pi.location_id = location_id
@@ -114,14 +105,10 @@ def test_lambda_handler_without_reservation_with_items(
     # Act
     response = lambda_handler(event, context)
 
-    # Assert: Expect a 201 response with purchase_id and a
-    # "stock_operation" key.
     assert response["statusCode"] == 201
     assert response["purchase_id"] == 101
     assert response["stock_operation"] == "deduct"
 
-    # Check that the response_body contains the purchase details
-    # and inserted items.
     resp_body = response["response_body"]
     assert resp_body["purchase"]["id"] == 101
     assert resp_body["purchase"]["user_id"] == 2
@@ -138,8 +125,6 @@ def test_lambda_handler_without_reservation_with_items(
     assert inserted_items[1]["location_id"] == 6
     assert inserted_items[1]["quantity"] == 2
 
-    # In this flow, add_purchase commits twice: once for the
-    # purchase and once for the items.
     assert fake_session.commit.call_count == 2
     fake_session.refresh.assert_called_once_with(fake_purchase)
     fake_session.close.assert_called_once()

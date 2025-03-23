@@ -1,19 +1,8 @@
 import json
-import pytest
 from unittest.mock import MagicMock, patch
-
-# Import the functions and handler from your module.
-from src.location_location_id_method import (
-    lambda_handler,
-    get_location,
-    delete_location,
-    update_location,
-)
+from src.location_location_id_method import lambda_handler
 
 
-# ------------------------------------------------------------------------------
-# Helper: Create a fake location instance to simulate your ORM model.
-# ------------------------------------------------------------------------------
 def create_fake_location():
     fake_location = MagicMock()
     fake_location.id = 1
@@ -218,7 +207,6 @@ def test_update_location_success(mock_get_session):
     headers = response.get("headers", {})
     assert headers.get("Content-Type") == "application/json"
     body = json.loads(response["body"])
-    # The update_location function returns updated_response with keys "id", "name" (address) and "description" (zip_code).
     assert body["id"] == fake_location.id
     assert body["name"] == payload["address"]
     assert body["description"] == payload["zip_code"]

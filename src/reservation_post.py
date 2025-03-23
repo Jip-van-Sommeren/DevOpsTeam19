@@ -2,7 +2,6 @@ from db_layer.db_connect import get_session
 from db_layer.basemodels import Reservation, ReservedItem
 import boto3
 import os
-import json
 
 sfn_client = boto3.client("stepfunctions")
 STATE_MACHINE_ARN = os.environ.get("STATE_MACHINE_ARN")

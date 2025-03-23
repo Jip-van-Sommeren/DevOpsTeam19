@@ -1,9 +1,7 @@
 import json
-import pytest
 from unittest.mock import MagicMock, patch
 
-# Import the lambda handler and helper functions from your module.
-from src.location_methods import lambda_handler, get_locations, add_location
+from src.location_methods import lambda_handler, get_locations
 
 
 def test_lambda_handler_not_found():
@@ -59,7 +57,7 @@ def test_get_locations_success(mock_get_session):
         "resource": "/locations",
         "queryStringParameters": {"skip": "0", "limit": "10"},
     }
-    context = {}
+
     response = get_locations(event)
     assert response["statusCode"] == 200
     headers = response.get("headers", {})
@@ -149,11 +147,10 @@ def test_post_add_location_success(mock_get_session):
     mock_get_session.return_value = fake_session
 
     # Patch the Location class used in add_location.
-    from src.location_methods import add_location
 
     with patch(
         "src.location_methods.Location", return_value=fake_location
-    ) as mock_Location:
+    ) as _:
         payload = {
             "address": "789 Oak St",
             "zip_code": "54321",

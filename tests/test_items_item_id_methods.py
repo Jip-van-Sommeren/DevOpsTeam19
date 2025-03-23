@@ -2,10 +2,8 @@ import json
 import os
 from unittest.mock import MagicMock, patch
 
-# Ensure S3_BUCKET is set for tests.
 os.environ["S3_BUCKET"] = "test-bucket"
 
-# Import the lambda handler from your module.
 from src.items_item_id_methods import lambda_handler
 
 

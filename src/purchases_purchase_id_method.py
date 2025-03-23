@@ -112,7 +112,6 @@ def update_purchase(purchase_id, payload):
                 "statusCode": 404,
                 "body": json.dumps({"message": "Purchase not found"}),
             }
-        # Update allowed fields (mapping 'name' to user_id, etc.)
         if "user_id" in payload:
             purchase.user_id = payload["user_id"]
         if "status" in payload:

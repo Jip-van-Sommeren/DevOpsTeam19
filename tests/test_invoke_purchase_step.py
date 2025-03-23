@@ -28,7 +28,6 @@ def test_state_machine_not_set(mock_sfn_client):
     Verify that when the STATE_MACHINE_ARN is not set,
     the function returns a 500 error.
     """
-    # Clear the environment variable and override the module global.
     os.environ.pop("STATE_MACHINE_ARN", None)
     # Overwrite the module-level variable.
     from src import invoke_purchase_step
@@ -52,7 +51,6 @@ def test_invalid_json_body(mock_sfn_client):
     """
     Verify that an invalid JSON body causes a 400 response.
     """
-    # Ensure the module-level STATE_MACHINE_ARN is set.
     from src import invoke_purchase_step
 
     invoke_purchase_step.STATE_MACHINE_ARN = "test-arn"
@@ -99,7 +97,6 @@ def test_saga_trigger_success(mock_sfn_client):
     assert "Saga triggered successfully" in resp_body["message"]
     assert resp_body["executionArn"] == "fake-execution-arn"
 
-    # Verify that the state machine was started with the expected input.
     expected_input = json.dumps(
         {"data": {**input_body, "stock_operation": "deduct"}}
     )

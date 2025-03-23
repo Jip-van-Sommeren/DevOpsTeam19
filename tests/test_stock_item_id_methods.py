@@ -1,14 +1,6 @@
 import json
-import pytest
 from unittest.mock import MagicMock, patch
-
-# Import the lambda_handler and helper functions from your module.
-from src.stock_item_id_methods import (
-    lambda_handler,
-    get_item,
-    delete_item,
-    update_stock,
-)
+from src.stock_item_id_methods import lambda_handler
 
 
 # ---------------------------------------------------------------------------
@@ -164,7 +156,6 @@ def test_delete_item_not_found(mock_get_session):
 # ---------------------------------------------------------------------------
 @patch("src.stock_item_id_methods.get_session")
 def test_put_update_stock_reset(mock_get_session):
-    # Test default operation (reset) if not specified.
     fake_item = MagicMock()
     fake_item.id = 3
     fake_item.item_id = "1"
@@ -178,7 +169,6 @@ def test_put_update_stock_reset(mock_get_session):
     fake_session.query.return_value = fake_query
     mock_get_session.return_value = fake_session
 
-    # Payload without "stock_operation" defaults to reset.
     payload = {"item_id": "1", "location_id": "loc1", "quantity": 80}
     event = {
         "httpMethod": "PUT",

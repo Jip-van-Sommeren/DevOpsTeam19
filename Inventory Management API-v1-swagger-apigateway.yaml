@@ -1,0 +1,827 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a simple API for managing inventory and warehouses."
+  version: "1.0.0"
+  title: "Inventory Management API"
+host: "wtobincubg.execute-api.eu-north-1.amazonaws.com"
+basePath: "/v1"
+schemes:
+- "https"
+paths:
+  /items:
+    get:
+      operationId: "get_items"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "skip"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/ArrayOfItem"
+        "400":
+          description: "400 response"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:items_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ArrayOfItem"
+        required: true
+        schema:
+          $ref: "#/definitions/ArrayOfItem"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:invokeItemsStep/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /items/status:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionArn"
+        in: "query"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:checkPostExecution/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /items/{item_id}:
+    get:
+      operationId: "get_item_stock_all_locations"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+        "404":
+          description: "404 response"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:items_item_id_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    put:
+      operationId: "update_item"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "Item"
+        required: true
+        schema:
+          $ref: "#/definitions/Item"
+      responses:
+        "200":
+          description: "200 response"
+        "404":
+          description: "404 response"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:items_item_id_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    delete:
+      operationId: "delete_item"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+        "404":
+          description: "404 response"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:items_item_id_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /locations:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "skip"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        required: false
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:location_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "Location"
+        required: true
+        schema:
+          $ref: "#/definitions/Location"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:location_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /locations/{location_id}:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "location_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:location_location_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    put:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "location_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:location_location_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    delete:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "location_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:location_location_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /purchases:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "skip"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        required: false
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:purchases_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "PurchaseRequest"
+        required: true
+        schema:
+          $ref: "#/definitions/PurchaseRequest"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:invokePurchaseStep/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /purchases/status:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionArn"
+        in: "query"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:checkPostExecution/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /purchases/{purchase_id}:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "purchase_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:purchases_purchase_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    put:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "purchase_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:purchases_purchase_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    delete:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "purchase_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:purchases_purchase_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /reservations:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_id"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "skip"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        required: false
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:reservations_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "ReservationRequest"
+        required: true
+        schema:
+          $ref: "#/definitions/ReservationRequest"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:invokeReservationStep/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /reservations/status:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "executionArn"
+        in: "query"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:checkPostExecution/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /reservations/{reservation_id}:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "reservation_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:reservations_reservation_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    put:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "reservation_id"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "ReservationUpdate"
+        required: true
+        schema:
+          $ref: "#/definitions/ReservationUpdate"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:reservations_reservation_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    delete:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "reservation_id"
+        in: "path"
+        required: true
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:reservations_reservation_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /stock:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "location_id"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "skip"
+        in: "query"
+        required: false
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:stock_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    post:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "stockItem"
+        required: true
+        schema:
+          $ref: "#/definitions/stockItem"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:stock_methods/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+  /stock/{item_id}:
+    get:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "location_id"
+        in: "query"
+        required: false
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:stock_items_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws_proxy"
+    put:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "updateStock"
+        required: true
+        schema:
+          $ref: "#/definitions/updateStock"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:stock_items_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+    delete:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "item_id"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "location_id"
+        in: "query"
+        required: false
+        type: "string"
+      responses: {}
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        uri: "arn:aws:apigateway:eu-north-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-north-1:904233098419:function:stock_items_id_method/invocations"
+        responses:
+          default:
+            statusCode: "200"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
+        contentHandling: "CONVERT_TO_TEXT"
+        type: "aws"
+definitions:
+  ArrayOfItem:
+    type: "array"
+    items:
+      $ref: "#/definitions/Item"
+  Item:
+    type: "object"
+    required:
+    - "description"
+    - "name"
+    - "price"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      price:
+        type: "integer"
+        format: "int32"
+      image_data:
+        type: "string"
+  ReservationUpdate:
+    type: "object"
+    required:
+    - "status"
+    properties:
+      status:
+        type: "string"
+        enum:
+        - "confirmed"
+        - "altered"
+        - "paid"
+        - "cancelled"
+      user_id:
+        type: "string"
+  updateStock:
+    type: "object"
+    required:
+    - "item"
+    - "operation"
+    properties:
+      operation:
+        type: "string"
+      item:
+        type: "object"
+        properties:
+          quantity:
+            type: "integer"
+            format: "int32"
+          item_id:
+            type: "integer"
+            format: "int32"
+          location_id:
+            type: "integer"
+            format: "int32"
+        required:
+        - "item_id"
+        - "location_id"
+        - "quantity"
+  ReservationRequest:
+    type: "object"
+    required:
+    - "items"
+    - "user_id"
+    properties:
+      user_id:
+        type: "string"
+      items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            item_id:
+              type: "string"
+            quantity:
+              type: "integer"
+              minimum: 1.0
+          required:
+          - "item_id"
+          - "quantity"
+  stockItem:
+    type: "object"
+    required:
+    - "items"
+    properties:
+      items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            item_id:
+              type: "integer"
+              minimum: 0.0
+            quantity:
+              type: "integer"
+              minimum: 1.0
+            location_id:
+              type: "integer"
+              minimum: 0.0
+          required:
+          - "item_id"
+          - "location_id"
+          - "quantity"
+  PurchaseRequest:
+    type: "object"
+    required:
+    - "items"
+    - "payment_token"
+    - "user_id"
+    properties:
+      user_id:
+        type: "string"
+      payment_token:
+        type: "string"
+      reservation_id:
+        type: "integer"
+      status:
+        type: "string"
+      items:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            item_id:
+              type: "string"
+            location_id:
+              type: "integer"
+              minimum: 1.0
+            quantity:
+              type: "integer"
+              minimum: 1.0
+          required:
+          - "item_id"
+          - "location_id"
+          - "quantity"
+  Location:
+    type: "object"
+    required:
+    - "address"
+    - "city"
+    - "number"
+    - "state"
+    - "street"
+    - "type"
+    - "zip_code"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+      address:
+        type: "string"
+      zip_code:
+        type: "string"
+      city:
+        type: "string"
+      street:
+        type: "string"
+      state:
+        type: "string"
+      number:
+        type: "integer"
+        format: "int32"
+      addition:
+        type: "string"
+      type:
+        type: "string"

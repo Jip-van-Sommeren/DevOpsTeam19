@@ -22,7 +22,7 @@ def cancel_purchase(purchase_id):
         session.commit()
     except Exception as e:
         session.rollback()
-        raise e  # Propagate the exception to be caught by the caller.
+        raise e
     finally:
         session.close()
 

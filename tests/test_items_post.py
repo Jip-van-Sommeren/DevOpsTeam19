@@ -1,12 +1,9 @@
 import os
 import base64
 from unittest.mock import MagicMock, patch
-
-# Ensure S3_BUCKET is set for testing.
-os.environ["S3_BUCKET"] = "test-bucket"
-
-# Import the Lambda handler and add_items function from your module.
 from src.items_post import lambda_handler
+
+os.environ["S3_BUCKET"] = "test-bucket"
 
 
 def test_lambda_handler_invalid_items():
@@ -51,7 +48,6 @@ def test_lambda_handler_success(
     fake_session = MagicMock()
     mock_get_session.return_value = fake_session
 
-    # Create two fake item instances that will be returned by the patched Item constructor.
     fake_item_without = MagicMock()
     fake_item_without.id = 1
     fake_item_without.name = "Item A"
@@ -72,8 +68,6 @@ def test_lambda_handler_success(
     # Define two test items:
     # - First item has no image_data.
     item1 = {"name": "Item A", "price": 50}
-    # - Second item includes description and base64-encoded image_data.
-    #    base64.b64decode("dGVzdA==") decodes to b"test".
     item2 = {
         "name": "Item B",
         "price": 100,
@@ -90,12 +84,10 @@ def test_lambda_handler_success(
     response = lambda_handler(event, context)
 
     # Assert
-    # The Lambda should return a 201 status with an 'added_items' list.
     assert response["statusCode"] == 201
     added_items = response["added_items"]
     assert len(added_items) == 2
 
-    # Verify the response for the first item (without image_data).
     resp_item1 = added_items[0]
     assert resp_item1["id"] == fake_item_without.id
     assert resp_item1["name"] == fake_item_without.name
@@ -103,7 +95,6 @@ def test_lambda_handler_success(
     assert resp_item1["price"] == fake_item_without.price
     assert "s3_key" not in resp_item1
 
-    # Verify the response for the second item (with image_data).
     resp_item2 = added_items[1]
     assert resp_item2["id"] == fake_item_with.id
     assert resp_item2["name"] == fake_item_with.name
@@ -111,7 +102,6 @@ def test_lambda_handler_success(
     assert resp_item2["price"] == fake_item_with.price
     assert resp_item2["s3_key"] == "items/item_fakehex.jpg"
 
-    # Verify that S3 put_object was called once for the second item.
     mock_put_object.assert_called_once_with(
         Bucket="test-bucket",
         Key="items/item_fakehex.jpg",
@@ -119,8 +109,6 @@ def test_lambda_handler_success(
         ContentType="image/jpeg",
     )
 
-    # Verify session methods:
-    # Since we process two items, commit and refresh should be called twice.
     assert fake_session.commit.call_count == 2
     assert fake_session.refresh.call_count == 2
     fake_session.close.assert_called_once()

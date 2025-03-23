@@ -30,9 +30,7 @@ def add_purchase(purchase):
                 purchased_item = PurchasedItem(
                     purchase_id=purchase_id,
                     item_id=item["item_id"],
-                    location_id=item[
-                        "location_id"
-                    ],  # Assumes PurchasedItem includes a location_id column.
+                    location_id=item["location_id"],
                     quantity=item["quantity"],
                 )
                 purchased_items_objects.append(purchased_item)

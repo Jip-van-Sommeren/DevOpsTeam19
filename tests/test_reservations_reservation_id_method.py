@@ -1,7 +1,13 @@
 import json
 import datetime
-import pytest
 from unittest.mock import MagicMock, patch
+
+from src.reservations_reservation_id_method import (
+    lambda_handler,
+    get_reservation,
+    delete_reservation,
+    update_reservation,
+)
 
 
 # Helper functions to create fake objects.
@@ -20,15 +26,6 @@ def create_fake_reserved_item(item_id, quantity):
     fake.item_id = item_id
     fake.quantity = quantity
     return fake
-
-
-# Import the functions under test.
-from src.reservations_reservation_id_method import (
-    lambda_handler,
-    get_reservation,
-    delete_reservation,
-    update_reservation,
-)
 
 
 # ---------------------------------------------------------------------------
@@ -76,17 +73,12 @@ def test_get_reservation_found(mock_get_session):
     fake_reserved_item = create_fake_reserved_item(10, 2)
 
     fake_session = MagicMock()
-    # We need to simulate two different query calls:
-    # 1. Query for the reservation.
     fake_query_res = MagicMock()
     fake_query_res.filter.return_value.first.return_value = fake_res
-    # 2. Query for reserved items.
     fake_query_items = MagicMock()
     fake_query_items.filter.return_value.all.return_value = [
         fake_reserved_item
     ]
-    # Use side_effect so that the first call to session.query returns fake_query_res,
-    # and the second call returns fake_query_items.
     fake_session.query.side_effect = [fake_query_res, fake_query_items]
     mock_get_session.return_value = fake_session
 

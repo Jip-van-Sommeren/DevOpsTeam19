@@ -3,7 +3,6 @@ import os
 import pytest
 from unittest.mock import patch
 
-# Import the lambda_handler from your module.
 from src.invoke_reservation_step import lambda_handler
 
 
@@ -50,7 +49,6 @@ def test_invalid_json_body(mock_sfn_client):
     """
     Verify that providing an invalid JSON body returns a 400 error.
     """
-    # Set the module-level variable for testing.
     from src import invoke_reservation_step
 
     invoke_reservation_step.STATE_MACHINE_ARN = "test-arn"
@@ -96,8 +94,6 @@ def test_saga_trigger_success(mock_sfn_client):
     assert "Saga triggered successfully" in resp_body["message"]
     assert resp_body["executionArn"] == "fake-execution-arn"
 
-    # Verify that the state machine was started with the expected input.
-    # The function adds "stock_operation": "deduct" to the body.
     expected_input = json.dumps(
         {"data": {**input_body, "stock_operation": "deduct"}}
     )

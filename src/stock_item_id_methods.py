@@ -163,7 +163,6 @@ def lambda_handler(event, context):
         return delete_item(item_id, payload.get("location_id"))
     elif http_method == "PUT":
 
-        # Default to "overwrite" which we treat as "reset"
         stock_operation = payload.get("stock_operation", "reset")
         try:
             updated_item = update_stock(payload, stock_operation)

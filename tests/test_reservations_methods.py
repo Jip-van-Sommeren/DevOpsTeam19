@@ -1,14 +1,12 @@
 import json
-import pytest
 from unittest.mock import MagicMock, patch
-
-# Import the lambda_handler and get_reservations from your module.
 from src.reservations_methods import lambda_handler, get_reservations
 
 
 def test_lambda_handler_not_found():
     """
-    Test that a request not matching the /reservations GET endpoint returns 404.
+    Test that a request not matching the /reservations GET
+    endpoint returns 404.
     """
     event = {"httpMethod": "POST", "resource": "/unknown"}  # Wrong HTTP method
     context = {}
@@ -41,17 +39,11 @@ def test_get_reservations_without_user_id(mock_get_session):
     fake_item2.quantity = 5
     fake_res2.reserved_items = [fake_item2]
 
-    # Create a fake session and simulate the query chain.
     fake_session = MagicMock()
-    # session.query(Reservation)
     fake_query = fake_session.query.return_value
-    # .options(joinedload(Reservation.reserved_items))
     fake_options = fake_query.options.return_value
-    # .offset(skip)
     fake_offset = fake_options.offset.return_value
-    # .limit(limit)
     fake_limit = fake_offset.limit.return_value
-    # .all() returns our list of fake reservations.
     fake_limit.all.return_value = [fake_res1, fake_res2]
     mock_get_session.return_value = fake_session
 
@@ -60,7 +52,6 @@ def test_get_reservations_without_user_id(mock_get_session):
         "resource": "/reservations",
         "queryStringParameters": {"skip": "0", "limit": "10"},
     }
-    context = {}
     response = get_reservations(event)
     assert response["statusCode"] == 200
     headers = response.get("headers", {})
@@ -120,7 +111,6 @@ def test_get_reservations_with_user_id(mock_get_session):
         "resource": "/reservations",
         "queryStringParameters": {"skip": "0", "limit": "10", "user_id": "30"},
     }
-    context = {}
     response = get_reservations(event)
     assert response["statusCode"] == 200
     reservations_list = json.loads(response["body"])

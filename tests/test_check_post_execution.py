@@ -2,7 +2,6 @@ import json
 import pytest
 from unittest.mock import patch
 
-# Adjust the import if your lambda file is named differently.
 from src.check_post_execution import lambda_handler
 
 

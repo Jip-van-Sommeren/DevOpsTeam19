@@ -13,7 +13,6 @@ def lambda_handler(event, context):
 
     state_machine_input = json.dumps({"data": body})
 
-    # Start the execution of the state machine
     if STATE_MACHINE_ARN is not None:
         response = sfn_client.start_execution(
             stateMachineArn=STATE_MACHINE_ARN,

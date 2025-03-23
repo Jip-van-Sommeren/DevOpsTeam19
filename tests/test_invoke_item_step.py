@@ -3,7 +3,6 @@ import os
 import pytest
 from unittest.mock import patch
 
-# Import the Lambda handler from your module.
 from src import invoke_item_step
 
 
@@ -28,7 +27,6 @@ def test_state_machine_not_set(mock_sfn_client):
     Test that if the STATE_MACHINE_ARN environment variable is not set,
     the Lambda returns a 500 error.
     """
-    # Remove the environment variable if present.
     os.environ.pop("STATE_MACHINE_ARN", None)
 
     event = {
@@ -96,11 +94,9 @@ def test_saga_trigger_success(mock_sfn_client):
     os.environ["STATE_MACHINE_ARN"] = "test-arn"
     invoke_item_step.STATE_MACHINE_ARN = "test-arn"
 
-    # Configure the mocked sfn_client to return a fake executionArn.
     fake_response = {"executionArn": "fake-execution-arn"}
     mock_sfn_client.start_execution.return_value = fake_response
 
-    # Prepare a valid event payload with a list of items.
     body_data = [
         {
             "name": "Item One",

@@ -1,15 +1,7 @@
 import json
 import datetime
-import pytest
 from unittest.mock import MagicMock, patch
-
-# Import the lambda_handler (and helper functions if needed) from your module.
-from src.purchases_purchase_id_method import (
-    lambda_handler,
-    get_purchase,
-    delete_purchase,
-    update_purchase,
-)
+from src.purchases_purchase_id_method import lambda_handler
 
 
 # -------------------------------------------------------------------------
@@ -55,7 +47,6 @@ def test_lambda_handler_missing_purchase_id():
 def test_get_purchase_found(mock_get_session):
     fake_purchase = create_fake_purchase(purchase_id=1)
     fake_session = MagicMock()
-    # Simulate the query chain returning the fake purchase.
     fake_session.query.return_value.options.return_value.filter.return_value.first.return_value = (
         fake_purchase
     )
@@ -127,7 +118,6 @@ def test_delete_purchase_found(mock_get_session):
     event = {"httpMethod": "DELETE", "pathParameters": {"purchase_id": "2"}}
     context = {}
     response = lambda_handler(event, context)
-    # Expected response contains purchase id, user_id as name, and payment_token as description.
     assert response["statusCode"] == 200
     headers = response.get("headers", {})
     assert headers.get("Content-Type") == "application/json"
@@ -137,7 +127,7 @@ def test_delete_purchase_found(mock_get_session):
     assert body["description"] == fake_purchase.payment_token
 
     # Verify deletion of associated purchased items is triggered.
-    fake_session.query.return_value.filter.assert_called()  # Called for PurchasedItem deletion.
+    fake_session.query.return_value.filter.assert_called()
     fake_session.delete.assert_called_once_with(fake_purchase)
     fake_session.commit.assert_called_once()
     fake_session.close.assert_called_once()
@@ -218,7 +208,6 @@ def test_update_purchase_success(mock_get_session):
     )
     mock_get_session.return_value = fake_session
 
-    # Prepare payload to update user_id and status.
     payload = {"user_id": 25, "status": "shipped"}
     event = {
         "httpMethod": "PUT",
@@ -231,7 +220,6 @@ def test_update_purchase_success(mock_get_session):
     headers = response.get("headers", {})
     assert headers.get("Content-Type") == "application/json"
     body_resp = json.loads(response["body"])
-    # Note: The update_purchase function maps purchase.user_id to "name" and payment_token to "description".
     assert body_resp["id"] == fake_purchase.id
     assert body_resp["name"] == payload["user_id"]  # Updated user_id
     assert (

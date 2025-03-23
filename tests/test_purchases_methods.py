@@ -1,5 +1,4 @@
 import json
-import pytest
 from unittest.mock import MagicMock, patch
 
 # Import the lambda_handler and get_purchases functions from your module.
@@ -63,7 +62,6 @@ def test_get_purchases_without_user_id(mock_get_session):
         "resource": "/purchases",
         "queryStringParameters": {"skip": "0", "limit": "10"},
     }
-    context = {}
     response = get_purchases(event)
     assert response["statusCode"] == 200
     headers = response.get("headers", {})
@@ -123,7 +121,6 @@ def test_get_purchases_with_user_id(mock_get_session):
         "resource": "/purchases",
         "queryStringParameters": {"skip": "0", "limit": "10", "user_id": "30"},
     }
-    context = {}
     response = get_purchases(event)
     assert response["statusCode"] == 200
     purchases_list = json.loads(response["body"])

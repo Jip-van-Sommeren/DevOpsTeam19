@@ -1,8 +1,5 @@
-import json
 import pytest
 from unittest.mock import MagicMock, patch
-
-# Import the lambda_handler from your module.
 from src.reservation_post import lambda_handler
 
 
@@ -23,8 +20,6 @@ def test_lambda_handler_success(
     fake_reservation.status = "reserved"
     mock_Reservation.return_value = fake_reservation
 
-    # Define a side_effect function for ReservedItem so that each instantiation
-    # returns a fake reserved item with attributes matching the input.
     def reserved_item_side_effect(
         reservation_id, item_id, location_id, quantity
     ):
@@ -76,17 +71,11 @@ def test_lambda_handler_success(
     assert second_item["location_id"] == 6
     assert second_item["quantity"] == 3
 
-    # Verify that commit was called twice: once after creating the reservation,
-    # and once after adding reserved items.
     assert fake_session.commit.call_count == 2
     fake_session.refresh.assert_called_once_with(fake_reservation)
     fake_session.close.assert_called_once()
 
 
-# ----------------------------------------------------------------------
-# Optionally, you can add tests for error scenarios.
-# For example, if 'user_id' or 'items' is missing.
-# ----------------------------------------------------------------------
 def test_lambda_handler_missing_user_id():
     event = {"data": {"items": [{"item_id": 10, "quantity": 2}]}}
     context = {}
