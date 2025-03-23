@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch
+
 from src.purchase_post import lambda_handler
 
 
@@ -80,7 +81,12 @@ def test_lambda_handler_without_reservation_with_items(
     fake_purchase = fake_purchase_instance(101, 2, "def")
     mock_Purchase.return_value = fake_purchase
 
-    def purchased_item_side_effect(_, item_id, location_id, quantity):
+    # Prepare side_effect for PurchasedItem so that each call
+    # returns a fake object
+    # with attributes matching the input.
+    def purchased_item_side_effect(
+        purchase_id, item_id, location_id, quantity
+    ):
         fake_pi = MagicMock()
         fake_pi.item_id = item_id
         fake_pi.location_id = location_id
@@ -105,10 +111,14 @@ def test_lambda_handler_without_reservation_with_items(
     # Act
     response = lambda_handler(event, context)
 
+    # Assert: Expect a 201 response with purchase_id and a
+    # "stock_operation" key.
     assert response["statusCode"] == 201
     assert response["purchase_id"] == 101
     assert response["stock_operation"] == "deduct"
 
+    # Check that the response_body contains the purchase details
+    # and inserted items.
     resp_body = response["response_body"]
     assert resp_body["purchase"]["id"] == 101
     assert resp_body["purchase"]["user_id"] == 2
